@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
   role: "user" | "assistant";
-  content: string;
+  content: string | React.ReactNode;
 }
 
 const Index = () => {
@@ -26,12 +26,12 @@ const Index = () => {
   const handleSend = async (message: string) => {
     try {
       setIsLoading(true);
-      const newMessages = [...messages, { role: "user", content: message }];
+      const newMessages = [...messages, { role: "user" as const, content: message }];
       setMessages(newMessages);
 
       const history = newMessages.map(({ role, content }) => ({
         role,
-        content,
+        content: typeof content === "string" ? content : "",
       }));
 
       const response = await sendMessage(message, history);
@@ -40,7 +40,7 @@ const Index = () => {
         setMessages([
           ...newMessages,
           {
-            role: "assistant",
+            role: "assistant" as const,
             content: (
               <div
                 dangerouslySetInnerHTML={{ __html: response.response }}
@@ -51,14 +51,14 @@ const Index = () => {
       } else {
         setMessages([
           ...newMessages,
-          { role: "assistant", content: response.response },
+          { role: "assistant" as const, content: response.response },
         ]);
       }
     } catch (error) {
       console.error("Error sending message:", error);
       toast({
-        title: "Fehler",
-        description: "Beim Senden der Nachricht ist ein Fehler aufgetreten.",
+        title: "Error",
+        description: "An error occurred while sending your message.",
         variant: "destructive",
       });
     } finally {

@@ -20,9 +20,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
   };
 
   const examples = [
-    "Wie viel Netto bleibt mir vom Brutto meines Einkommens?",
-    "Welche Regionen in Südostasien sind im August hinsichtlich Wetter gut bereisbar?",
-    "Ich brauche einen Textgenerator für Musikrezensionen",
+    "How much net salary will remain from my gross income?",
+    "Which regions in Southeast Asia are good for traveling in August regarding weather?",
+    "I need a text generator for music reviews",
   ];
 
   return (
@@ -45,7 +45,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Sende eine Nachricht..."
+            placeholder="Send a message..."
             className="flex-1 bg-gray-800 border-gray-700 text-gray-200 resize-none"
             rows={1}
             onKeyDown={(e) => {
