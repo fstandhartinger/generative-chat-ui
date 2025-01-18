@@ -29,7 +29,7 @@ export const sendMessage = async (
 
       const chatCompletion = await anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
-        max_tokens: 32768,
+        max_tokens: 4096, // Reduced to a safe value below the 8,192 limit
         temperature: 0.7,
         system: `You are an AI assistant that responds either with text or HTML fragments. 
           When responding with HTML, ensure the fragment is:
