@@ -24,6 +24,7 @@ export const sendMessage = async (
     try {
       const anthropic = new Anthropic({
         apiKey: anthropicKey,
+        dangerouslyAllowBrowser: true,
       });
 
       const chatCompletion = await anthropic.messages.create({
