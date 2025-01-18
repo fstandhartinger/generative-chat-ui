@@ -59,10 +59,18 @@ export const sendMessage = async (
           
           Example 3: Music Review Generator
           For music review requests, create an HTML interface with:
+          - Input fields for artist and song name
           - Multiple choice buttons (Accept/Neutral/Reject)
           - Checkboxes for song aspects (melody, vocals, beat)
-          - Dynamic text generation based on selections
-          - Integration with chat flow for responses
+          - Generate review text directly in the UI without making external API calls
+          - Display the generated review in a designated area within the same HTML fragment
+          
+          IMPORTANT: When creating interactive HTML fragments:
+          1. DO NOT make external API calls from within the fragment
+          2. Keep all functionality self-contained within the fragment
+          3. Generate any text responses directly in JavaScript
+          4. Use local event handlers only
+          5. Avoid referencing external resources unless absolutely necessary
           
           When generating HTML:
           - Use classes like bg-gray-800 for dark backgrounds
