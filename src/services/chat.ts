@@ -50,7 +50,6 @@ export const sendMessage = async (
           { role: "user", content: message }
         ],
         tools: [{
-          type: "function",
           function: {
             name: "generate_response",
             description: "Generate either a text or HTML response",
@@ -71,7 +70,12 @@ export const sendMessage = async (
             }
           }
         }],
-        tool_choice: { type: "tool" }
+        tool_choice: { 
+          type: "tool",
+          tool: {
+            name: "generate_response"
+          }
+        }
       });
 
       const responseContent = chatCompletion.content[0].type === 'text' 
