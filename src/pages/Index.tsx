@@ -23,6 +23,10 @@ const Index = () => {
     scrollToBottom();
   }, [messages]);
 
+  const handleNewChat = () => {
+    setMessages([]);
+  };
+
   const handleSend = async (message: string) => {
     try {
       setIsLoading(true);
@@ -68,7 +72,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-chatbg text-gray-200">
-      <div className="pb-32">
+      <div className="pb-32 max-h-screen overflow-y-auto">
         {messages.length === 0 ? (
           <div className="h-screen flex items-center justify-center">
             <h1 className="text-4xl font-bold text-gray-500">
@@ -86,7 +90,11 @@ const Index = () => {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <ChatInput onSend={handleSend} isLoading={isLoading} />
+      <ChatInput 
+        onSend={handleSend} 
+        isLoading={isLoading} 
+        onNewChat={handleNewChat}
+      />
     </div>
   );
 };

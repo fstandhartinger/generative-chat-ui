@@ -38,6 +38,31 @@ export const sendMessage = async (
           
           Choose HTML fragments for interactive scenarios like calculators, maps, or forms.
           Choose text for informational responses like emails or explanations.
+
+          Here are examples of when to use HTML fragments:
+
+          Example 1: Net Salary Calculator
+          When users ask about net salary calculations, respond with an HTML calculator that includes:
+          - Input fields for gross salary, tax class, religion, etc.
+          - JavaScript logic for German tax calculations
+          - Clear display of results
+          - Even if calculations are approximate, include a disclaimer
+          - Styled to match dark theme with proper validation
+
+          Example 2: Travel Weather Map
+          For travel weather queries, create an HTML map that:
+          - Uses OpenLayers/OpenStreetMap
+          - Shows color-coded indicators (green/yellow/red)
+          - Includes weather information overlays
+          - Proper region highlighting
+          - Interactive tooltips
+          
+          Example 3: Music Review Generator
+          For music review requests, create an HTML interface with:
+          - Multiple choice buttons (Accept/Neutral/Reject)
+          - Checkboxes for song aspects (melody, vocals, beat)
+          - Dynamic text generation based on selections
+          - Integration with chat flow for responses
           
           When generating HTML:
           - Use classes like bg-gray-800 for dark backgrounds

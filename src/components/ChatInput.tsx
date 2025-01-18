@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { SendHorizontal } from "lucide-react";
+import { SendHorizontal, RefreshCw } from "lucide-react";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
   isLoading: boolean;
+  onNewChat: () => void;
 }
 
-export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
+export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewChat }) => {
   const [message, setMessage] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -20,7 +21,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
   };
 
   const examples = [
-    "How much net salary will remain from my gross income?",
+    "How much net salary will remain from my gross income according to german law?",
     "Which regions in Southeast Asia are good for traveling in August regarding weather?",
     "I need a text generator for music reviews",
   ];
@@ -28,18 +29,28 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-chatbg border-t border-gray-700 p-4">
       <div className="max-w-3xl mx-auto">
-        <div className="flex flex-wrap gap-2 mb-4">
-          {examples.map((example, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setMessage(example);
-              }}
-              className="px-4 py-2 bg-gray-800 text-gray-200 rounded-full text-sm hover:bg-gray-700 transition-colors"
-            >
-              {example}
-            </button>
-          ))}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap gap-2">
+            {examples.map((example, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setMessage(example);
+                }}
+                className="px-4 py-2 bg-gray-800 text-gray-200 rounded-full text-sm hover:bg-gray-700 transition-colors"
+              >
+                {example}
+              </button>
+            ))}
+          </div>
+          <Button
+            onClick={onNewChat}
+            variant="outline"
+            className="text-gray-200 border-gray-700 hover:bg-gray-800"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            New Chat
+          </Button>
         </div>
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Textarea
