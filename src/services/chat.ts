@@ -50,25 +50,33 @@ export const sendMessage = async (
           { role: "user", content: message }
         ],
         tools: [{
-          name: "generate_response",
-          description: "Generate either a text or HTML response",
-          parameters: {
-            type: "object",
-            properties: {
-              responsetype: {
-                type: "string",
-                enum: ["text", "html"],
-                description: "The type of response to generate"
+          type: "function",
+          function: {
+            name: "generate_response",
+            description: "Generate either a text or HTML response",
+            parameters: {
+              type: "object",
+              properties: {
+                responsetype: {
+                  type: "string",
+                  enum: ["text", "html"],
+                  description: "The type of response to generate"
+                },
+                response: {
+                  type: "string",
+                  description: "The actual response content, either plain text or HTML"
+                }
               },
-              response: {
-                type: "string",
-                description: "The actual response content, either plain text or HTML"
-              }
-            },
-            required: ["responsetype", "response"]
+              required: ["responsetype", "response"]
+            }
           }
         }],
-        tool_choice: { name: "generate_response" }
+        tool_choice: {
+          type: "function",
+          function: {
+            name: "generate_response"
+          }
+        }
       });
 
       const responseContent = chatCompletion.content[0].type === 'text' 
