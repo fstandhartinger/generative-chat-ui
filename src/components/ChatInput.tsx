@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { SendHorizontal, RefreshCw } from "lucide-react";
+import { SendHorizontal, RefreshCw, Key } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -11,12 +14,33 @@ interface ChatInputProps {
 
 export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewChat }) => {
   const [message, setMessage] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const savedKey = localStorage.getItem('ANTHROPIC_API_KEY');
+    if (savedKey) {
+      setApiKey(savedKey);
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && !isLoading) {
       onSend(message.trim());
       setMessage("");
+    }
+  };
+
+  const handleSaveApiKey = () => {
+    if (apiKey.trim()) {
+      localStorage.setItem('ANTHROPIC_API_KEY', apiKey.trim());
+      setShowApiKeyDialog(false);
+      toast({
+        title: "API Key Saved",
+        description: "Your Anthropic API key has been saved successfully.",
+      });
     }
   };
 
@@ -43,14 +67,42 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
               </button>
             ))}
           </div>
-          <Button
-            onClick={onNewChat}
-            variant="outline"
-            className="text-gray-200 border-gray-700 hover:bg-gray-800"
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            New Chat
-          </Button>
+          <div className="flex gap-2">
+            <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="text-gray-200 border-gray-700 hover:bg-gray-800"
+                >
+                  <Key className="mr-2 h-4 w-4" />
+                  Anthropic API Key
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-gray-800 text-gray-200">
+                <DialogHeader>
+                  <DialogTitle>Set Anthropic API Key</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-4">
+                  <Input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="Enter your Anthropic API key"
+                    className="bg-gray-700 border-gray-600 text-gray-200"
+                  />
+                  <Button onClick={handleSaveApiKey}>Save API Key</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <Button
+              onClick={onNewChat}
+              variant="outline"
+              className="text-gray-200 border-gray-700 hover:bg-gray-800"
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              New Chat
+            </Button>
+          </div>
         </div>
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Textarea
