@@ -29,7 +29,7 @@ export const sendMessage = async (
 
       const chatCompletion = await anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
-        max_tokens: 4096, // Reduced to a safe value below the 8,192 limit
+        max_tokens: 4096,
         temperature: 0.7,
         system: `You are an AI assistant that responds either with text or HTML fragments. 
           When responding with HTML, ensure the fragment is:
@@ -50,28 +50,25 @@ export const sendMessage = async (
           { role: "user", content: message }
         ],
         tools: [{
-          type: "function",
-          function: {
-            name: "generate_response",
-            description: "Generate either a text or HTML response",
-            parameters: {
-              type: "object",
-              properties: {
-                responsetype: {
-                  type: "string",
-                  enum: ["text", "html"],
-                  description: "The type of response to generate"
-                },
-                response: {
-                  type: "string",
-                  description: "The actual response content, either plain text or HTML"
-                }
+          name: "generate_response",
+          description: "Generate either a text or HTML response",
+          parameters: {
+            type: "object",
+            properties: {
+              responsetype: {
+                type: "string",
+                enum: ["text", "html"],
+                description: "The type of response to generate"
               },
-              required: ["responsetype", "response"]
-            }
+              response: {
+                type: "string",
+                description: "The actual response content, either plain text or HTML"
+              }
+            },
+            required: ["responsetype", "response"]
           }
         }],
-        tool_choice: { type: "function", function: { name: "generate_response" } }
+        tool_choice: { name: "generate_response" }
       });
 
       const responseContent = chatCompletion.content[0].type === 'text' 
