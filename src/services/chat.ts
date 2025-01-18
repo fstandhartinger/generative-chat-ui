@@ -39,12 +39,6 @@ export const sendMessage = async (
           5. Provides clear feedback for user interactions
           6. Uses semantic HTML and ARIA attributes for accessibility
           
-          Respond in JSON format with:
-          {
-            "responsetype": "text" or "html",
-            "response": "your response here"
-          }
-          
           Choose HTML fragments for interactive scenarios like calculators, maps, or forms.
           Choose text for informational responses like emails or explanations.
 
@@ -94,12 +88,22 @@ export const sendMessage = async (
             content: msg.content
           })),
           { role: "user", content: message }
-        ],
-        response_format: { type: "json_object" }
+        ]
       });
 
-      console.log("Anthropic response:", chatCompletion.content[0].text);
-      return JSON.parse(chatCompletion.content[0].text);
+      const responseContent = chatCompletion.content[0].type === 'text' 
+        ? chatCompletion.content[0].text
+        : '';
+
+      try {
+        const parsedResponse = JSON.parse(responseContent);
+        return parsedResponse;
+      } catch {
+        return {
+          responsetype: "text",
+          response: responseContent
+        };
+      }
     } catch (error) {
       console.error("Error calling Anthropic:", error);
       return {
@@ -123,12 +127,6 @@ export const sendMessage = async (
           4. Includes error handling and validation where appropriate
           5. Provides clear feedback for user interactions
           6. Uses semantic HTML and ARIA attributes for accessibility
-          
-          Respond in JSON format with:
-          {
-            "responsetype": "text" or "html",
-            "response": "your response here"
-          }
           
           Choose HTML fragments for interactive scenarios like calculators, maps, or forms.
           Choose text for informational responses like emails or explanations.
@@ -172,13 +170,7 @@ export const sendMessage = async (
           - rounded-lg for rounded corners
           - p-4 for padding
           - hover:bg-gray-700 for hover states
-          - border-gray-700 for borders
-          
-          Example styling:
-          <div class="bg-gray-800 text-gray-200 p-4 rounded-lg border border-gray-700">
-            <input class="bg-gray-700 text-gray-200 p-2 rounded-md border border-gray-600">
-            <button class="bg-accent hover:bg-accent/90 text-white px-4 py-2 rounded-md">
-          </div>`,
+          - border-gray-700 for borders`,
         },
         ...history.map(msg => ({
           role: msg.role,
@@ -191,9 +183,6 @@ export const sendMessage = async (
       max_completion_tokens: 32768,
       top_p: 1,
       stream: false,
-      response_format: {
-        type: "json_object",
-      },
     });
 
     console.log("Groq response:", chatCompletion.choices[0]?.message?.content);
