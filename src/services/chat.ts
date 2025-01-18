@@ -28,7 +28,7 @@ export const sendMessage = async (
       });
 
       const chatCompletion = await anthropic.messages.create({
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-3-sonnet-20240122",
         max_tokens: 4096,
         temperature: 0.7,
         system: `You are an AI assistant that responds either with text or HTML fragments. 
@@ -71,12 +71,7 @@ export const sendMessage = async (
             }
           }
         }],
-        tool_choice: {
-          type: "function",
-          function: {
-            name: "generate_response"
-          }
-        }
+        tool_choice: { type: "tool" }
       });
 
       const responseContent = chatCompletion.content[0].type === 'text' 
@@ -101,7 +96,6 @@ export const sendMessage = async (
     }
   }
 
-  // Fallback to Groq if no Anthropic key is present
   try {
     const chatCompletion = await groq.chat.completions.create({
       messages: [
