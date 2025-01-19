@@ -59,12 +59,22 @@ export const sendMessage = async (
         ],
       });
 
-      // Access the content correctly from the response
       initialResponse = chatCompletion.content[0].type === 'text' 
         ? chatCompletion.content[0].text
         : '';
         
       console.log("Anthropic response:", initialResponse);
+
+      // Try to parse the response as JSON first
+      try {
+        const parsedResponse = JSON.parse(initialResponse);
+        if (parsedResponse.responsetype && parsedResponse.response) {
+          console.log("Successfully parsed Anthropic response as JSON");
+          return parsedResponse;
+        }
+      } catch (parseError) {
+        console.log("Anthropic response is not valid JSON, will use Groq for formatting");
+      }
     } catch (error) {
       console.error("Error calling Anthropic:", error);
       initialResponse = "Sorry, there was an error processing your request.";
@@ -103,6 +113,9 @@ export const sendMessage = async (
         max_tokens: 32768,
         top_p: 1,
         stream: false,
+        response_format: {
+          type: "json_object"
+        }
       });
 
       console.log("Groq direct response:", chatCompletion.choices[0]?.message?.content);
@@ -159,6 +172,9 @@ export const sendMessage = async (
       max_tokens: 32768,
       top_p: 1,
       stream: false,
+      response_format: {
+        type: "json_object"
+      }
     });
 
     console.log("Groq formatting response:", chatCompletion.choices[0]?.message?.content);
