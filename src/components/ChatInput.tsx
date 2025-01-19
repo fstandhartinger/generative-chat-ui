@@ -68,7 +68,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-chatbg border-t border-gray-700 p-4">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto" ref={(el) => {
+        if (el) {
+          const height = el.getBoundingClientRect().height;
+          const totalHeight = height + 32;
+          document.documentElement.style.setProperty('--chat-input-height', `${totalHeight}px`);
+        }
+      }}>
         <div className="flex flex-col space-y-4 mb-4">
           <div className="flex justify-end gap-2">
             <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>

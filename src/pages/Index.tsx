@@ -126,9 +126,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-chatbg text-gray-200">
-      <div className="pb-32 max-h-screen overflow-y-auto">
+      <div className="h-[calc(100vh-var(--chat-input-height,0px))] overflow-y-auto">
         {messages.length === 0 ? (
-          <div className="h-screen flex items-center justify-center">
+          <div className="h-full flex items-center justify-center">
             <h1 className="text-4xl font-bold text-gray-500">
               Generative UI Chat
             </h1>
