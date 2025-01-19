@@ -46,16 +46,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
 
   const examples = [
     {
-      shortText: "Which regions in Southeast Asia are good for traveling in August regarding weather?",
-      fullText: "I'm planning to travel to Southeast Asia in August. Could you create an interactive map showing which regions have favorable weather conditions during this time? Please consider factors like rainfall (monsoon season), temperature, and humidity. I'd like to see the regions color-coded (green for ideal, yellow for acceptable, red for unfavorable conditions) on a map, with tooltips explaining the specific weather patterns for each region."
+      shortText: "Welche Regionen in Südostasien eignen sich für Reisen im August?",
+      fullText: "Welche Regionen in Südostasien eignen sich für Reisen im August? Ich möchte wissen, welche Gebiete zu dieser Zeit günstige Wetterbedingungen haben. Wichtige Faktoren sind dabei Niederschlag (Monsunzeit), Temperatur und Luftfeuchtigkeit. Ich interessiere mich besonders für eine Übersicht der Regionen, die ideal (grün), akzeptabel (gelb) oder ungünstig (rot) für Reisen sind, mit detaillierten Informationen zu den jeweiligen Wetterbedingungen."
     },
     {
-      shortText: "I need a text generator for music reviews",
-      fullText: "I need an interface to help me generate music reviews for songs that I'm considering adding to my playlist. The interface should include options to rate different aspects of the song (melody, vocals, beat, lyrics, etc.) using checkboxes or radio buttons, and three main verdict buttons (Accept, Neutral, Reject). When I click one of these buttons, it should generate a review text that reflects my ratings of the individual aspects. The review should explain why I made this decision, highlighting both positive and negative aspects I selected."
+      shortText: "Musikstücke für Playlist bewerten mit Kriterien wie Melodie, Gesang und Beat...",
+      fullText: "Musikstücke für Playlist bewerten mit Kriterien wie Melodie, Gesang und Beat. Ich muss für jedes Musikstück eine kurze Bewertung erstellen, die zu einer Entscheidung führt, ob das Stück in meine Spotify-Playlist aufgenommen wird. Dabei möchte ich verschiedene Aspekte wie Melodie, Gesang, Beat und Lyrics einzeln bewerten können und am Ende zu einem klaren Urteil (Aufnehmen oder Ablehnen) kommen, das durch die Einzelbewertungen begründet wird."
     },
     {
-      shortText: "How much net salary will remain from my gross income according to german law?",
-      fullText: "Could you create a German net salary calculator that helps me understand how much of my gross income will remain after taxes and deductions? I need an interface where I can input my annual gross salary, tax class, whether I pay church tax, and other relevant factors. The calculator should provide an approximate breakdown of all deductions (income tax, solidarity surcharge, health insurance, etc.) and show the estimated monthly net salary. Please include a note that this is an approximation and might not reflect all individual circumstances."
+      shortText: "Wie viel Netto bleibt von meinem Brutto-Gehalt nach deutschem Steuerrecht?",
+      fullText: "Wie viel Netto bleibt von meinem Brutto-Gehalt nach deutschem Steuerrecht? Ich möchte verstehen, wie viel von meinem Brutto-Jahresgehalt nach allen Abzügen übrig bleibt. Dabei sind Faktoren wie meine Steuerklasse, ob ich Kirchensteuer zahle und andere relevante Aspekte zu berücksichtigen. Ich brauche eine Aufschlüsselung aller Abzüge (Einkommensteuer, Solidaritätszuschlag, Krankenversicherung, etc.) und den resultierenden monatlichen Netto-Betrag."
     }
   ];
 
