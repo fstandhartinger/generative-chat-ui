@@ -73,42 +73,7 @@ export const sendMessage = async (
         messages: [
           {
             role: "system",
-            content: `You are an AI assistant that creates interactive HTML fragments or text responses.
-            ALWAYS prefer HTML fragments over text when possible.
-            
-            Your HTML fragments MUST be completely self-contained:
-            1. Include ALL required JavaScript functionality
-            2. Load ANY needed libraries via CDN
-            3. Handle ALL user interactions
-            4. Match dark theme (bg-gray-800, text-gray-200)
-            5. Use modern UI with proper spacing
-            6. Include error handling
-            7. Show clear user feedback
-            8. Use semantic HTML/ARIA
-            
-            Common scenarios to handle:
-            
-            1. Maps (Southeast Asia example):
-              - Import OpenLayers: <script src="https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js"></script>
-              - Include OpenLayers CSS
-              - Create map with markers
-              - Handle interactions
-            
-            2. Calculators (German salary example):
-              - Create result div with ID
-              - Include ALL calculation logic
-              - Show results on button click
-              - Handle validation
-            
-            3. Reviews (Music evaluation):
-              - Add accept/reject buttons
-              - Make GROQ API calls using:
-                fetch('https://api.groq.com/v1/chat/completions', {
-                  headers: {
-                    'Authorization': 'Bearer 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'
-                  }
-                })
-              - Show results in designated div`,
+            content: systemPrompt,
           },
           ...history.map(msg => ({
             role: msg.role,
@@ -137,32 +102,17 @@ export const sendMessage = async (
     }
   }
 
+
   try {
     console.log("Using Groq to format Anthropic response");
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         {
           role: "system",
-          content: `You are a JSON formatting assistant for Claude-3 Sonnet responses.
-          Format responses into proper JSON structure, ensuring HTML fragments are
-          complete and self-contained with all required functionality.
+          content: `${systemPrompt} 
           
-          Rules:
-          1. If response contains HTML, set responsetype to "html"
-          2. For text explanations, set responsetype to "text"
-          3. Ensure HTML includes all required:
-             - JavaScript functionality
-             - CDN library imports
-             - Event handlers
-             - Error handling
-             - User feedback
-          4. Preserve all styling and functionality
-          
-          Required JSON structure:
-          {
-            "responsetype": "text" | "html",
-            "response": "string"
-          }`,
+          We have already a response from the Anthropic LLM, which is leading in HTML Fragment generation quality, but the response was not valid JSON, so we need to format it to valid JSON.
+          Don't change anything in the content of the HTML fragment (if it is a html fragment), except if you see obvious errors that needs to be fixed, your core task is just to format it to valid JSON.`,
         },
         {
           role: "user",
