@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Progress } from "@/components/ui/progress";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 interface ChatMessageProps {
   role: "user" | "assistant";
@@ -27,12 +27,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, isLoadi
         </div>
         <div className="flex-1 space-y-2 overflow-hidden">
           {isLoading ? (
-            <div className="space-y-4">
-              <div className="h-4 w-full">
-                <Progress value={undefined} className="h-1" />
-              </div>
-              <p className="text-gray-400 text-sm">AI is thinking...</p>
-            </div>
+            <LoadingSpinner />
           ) : typeof content === "string" ? (
             <p className="text-gray-200 leading-relaxed">{content}</p>
           ) : (
