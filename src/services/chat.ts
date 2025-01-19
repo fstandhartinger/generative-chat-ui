@@ -59,7 +59,11 @@ export const sendMessage = async (
         ],
       });
 
-      initialResponse = chatCompletion.content[0].text;
+      // Access the content correctly from the response
+      initialResponse = chatCompletion.content[0].type === 'text' 
+        ? chatCompletion.content[0].text
+        : '';
+        
       console.log("Anthropic response:", initialResponse);
     } catch (error) {
       console.error("Error calling Anthropic:", error);
@@ -67,8 +71,8 @@ export const sendMessage = async (
     }
   }
 
-  // Wenn kein Anthropic Key vorhanden ist oder ein Fehler auftrat, 
-  // verwenden wir direkt Groq für die vollständige Verarbeitung
+  // If no Anthropic key is present or an error occurred, 
+  // use Groq directly
   if (!anthropicKey || initialResponse === "Sorry, there was an error processing your request.") {
     try {
       console.log("Using Groq directly");
@@ -112,7 +116,7 @@ export const sendMessage = async (
     }
   }
 
-  // Wenn wir eine Antwort von Anthropic haben, lassen wir diese von Groq in das gewünschte Format bringen
+  // If we have a response from Anthropic, let Groq format it into the desired structure
   try {
     console.log("Using Groq to format Anthropic response");
     const chatCompletion = await groq.chat.completions.create({
