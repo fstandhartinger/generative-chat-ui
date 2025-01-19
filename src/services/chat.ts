@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 import { Anthropic } from '@anthropic-ai/sdk';
+import { getSystemPrompt } from '@/utils/promptExamples';
 
 const groq = new Groq({
   apiKey: "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",
@@ -18,6 +19,7 @@ export const sendMessage = async (
   console.log("Sending message:", message);
   
   const anthropicKey = localStorage.getItem('ANTHROPIC_API_KEY');
+  const systemPrompt = getSystemPrompt();
   
   let initialResponse = "";
   
@@ -33,60 +35,7 @@ export const sendMessage = async (
         model: "claude-3-sonnet-20240229",
         max_tokens: 4096,
         temperature: 0.7,
-        system: `You are an AI assistant that responds with either text or HTML fragments. 
-          
-          IMPORTANT: When deciding between text and HTML responses, ALWAYS prefer HTML fragments.
-          This application demonstrates that LLM chat apps can respond with generative UI instead of just text.
-          
-          When creating HTML fragments, ensure they are:
-          1. Completely self-contained with ALL required functionality:
-             - Include ALL necessary JavaScript code
-             - Load required libraries from CDNs (e.g., OpenLayers for maps)
-             - Handle all interactions within the fragment
-          2. Match the dark theme (bg-gray-800, text-gray-200, etc.)
-          3. Use modern, rounded UI elements with proper padding/spacing
-          4. Include error handling and validation
-          5. Provide clear feedback for user interactions
-          6. Use semantic HTML and ARIA attributes
-          
-          Specific requirements for common scenarios:
-          
-          1. For maps (e.g., Southeast Asia regions):
-             - Use OpenLayers with OpenStreetMap
-             - Include proper CDN imports
-             - Create layers for region markers (green/yellow/red)
-             - Handle zoom/pan interactions
-          
-          2. For calculators (e.g., German net salary):
-             - Create a designated result div with a specific ID
-             - Show results in the div on button click
-             - Include all calculation logic in JavaScript
-             - Handle edge cases and validation
-          
-          3. For evaluations (e.g., song reviews):
-             - Include buttons for accept/reject
-             - Make API calls to GROQ's LLAMA 3.3 model using:
-               fetch('https://api.groq.com/v1/chat/completions', {
-                 method: 'POST',
-                 headers: {
-                   'Authorization': 'Bearer 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',
-                   'Content-Type': 'application/json'
-                 },
-                 body: JSON.stringify({
-                   model: "llama-3.3-70b-versatile",
-                   messages: [
-                     { role: "system", content: "You are a music review assistant." },
-                     { role: "user", content: "Review this song: [song details]" }
-                   ]
-                 })
-               })
-             - Display results in a designated div
-          
-          Format your response as a JSON object:
-          {
-            "responsetype": "text" or "html",
-            "response": "your response content"
-          }`,
+        system: systemPrompt,
         messages: [
           ...history.map(msg => ({
             role: msg.role,
