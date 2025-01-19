@@ -46,11 +46,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
 
   const examples = [
     {
-      shortText: "Best regions to visit in Southeast Asia in August...",
-      fullText: "Best regions to visit in Southeast Asia in August? I need to know which areas have favorable weather conditions during this time. Important factors include rainfall (monsoon season), temperature, and humidity. I'm particularly interested in an overview of regions that are ideal (green), acceptable (yellow), or unfavorable (red) for travel, with detailed information about the respective weather conditions."
+      shortText: "What are the best regions to visit in Southeast Asia in August...",
+      fullText: "What are the best regions to visit in Southeast Asia in August? I need to know which areas have favorable weather conditions during this time. Important factors include rainfall (monsoon season), temperature, and humidity. I'm particularly interested in an overview of regions that are ideal, acceptable, or unfavorable for travel, with detailed information about the respective weather conditions."
     },
     {
-      shortText: "Help me evaluate songs for my playlist based on melody, vocals...",
+      shortText: "Help me evaluate songs for my playlist based on melody, vocals, and beat...",
       fullText: "Help me evaluate songs for my playlist based on melody, vocals, and beat. I need to create a brief assessment for each song that leads to a decision whether to include it in my Spotify playlist. I want to evaluate different aspects like melody, vocals, beat, and lyrics individually and arrive at a clear verdict (accept or reject) that is justified by the individual ratings."
     },
     {

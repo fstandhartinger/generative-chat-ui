@@ -20,6 +20,7 @@ export const sendMessage = async (
   
   const anthropicKey = localStorage.getItem('ANTHROPIC_API_KEY');
   const systemPrompt = getSystemPrompt();
+  const jsonFormatPrompt = `${systemPrompt}\n\nIMPORTANT: You must format your response as a JSON object with exactly two fields:\n1. "responsetype": Either "text" or "html"\n2. "response": Your actual response content as a string\n\nFor example: {"responsetype": "text", "response": "Hello world"}`;
   
   let initialResponse = "";
   
@@ -35,14 +36,14 @@ export const sendMessage = async (
         model: "claude-3-sonnet-20240229",
         max_tokens: 4096,
         temperature: 0.7,
-        system: systemPrompt,
+        system: jsonFormatPrompt,
         messages: [
           ...history.map(msg => ({
             role: msg.role,
             content: msg.content
           })),
           { role: "user", content: message }
-        ],
+        ]
       });
 
       initialResponse = chatCompletion.content[0].type === 'text' 
@@ -57,8 +58,9 @@ export const sendMessage = async (
           console.log("Successfully parsed Anthropic response as JSON");
           return parsedResponse;
         }
+        console.log("Anthropic response missing required fields, falling back to Groq");
       } catch (parseError) {
-        console.log("Anthropic response is not valid JSON, will use Groq for formatting");
+        console.log("Anthropic response is not valid JSON:", parseError);
       }
     } catch (error) {
       console.error("Error calling Anthropic:", error);
@@ -66,58 +68,20 @@ export const sendMessage = async (
     }
   }
 
-  if (!anthropicKey || initialResponse === "Sorry, there was an error processing your request.") {
-    try {
-      console.log("Using Groq directly");
-      const chatCompletion = await groq.chat.completions.create({
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          ...history.map(msg => ({
-            role: msg.role,
-            content: msg.content
-          })),
-          { role: "user", content: message },
-        ],
-        model: "llama-3.3-70b-versatile",
-        temperature: 0.7,
-        max_tokens: 32768,
-        top_p: 1,
-        stream: false,
-        response_format: {
-          type: "json_object"
-        }
-      });
-
-      console.log("Groq direct response:", chatCompletion.choices[0]?.message?.content);
-      return JSON.parse(chatCompletion.choices[0]?.message?.content || "{}");
-    } catch (error) {
-      console.error("Error calling Groq directly:", error);
-      return {
-        responsetype: "text",
-        response: "Sorry, there was an error processing your request.",
-      };
-    }
-  }
-
-
+  // Fallback to Groq if no Anthropic key or error occurred
   try {
-    console.log("Using Groq to format Anthropic response");
+    console.log("Using Groq as fallback");
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         {
           role: "system",
-          content: `${systemPrompt} 
-          
-          We have already a response from the Anthropic LLM, which is leading in HTML Fragment generation quality, but the response was not valid JSON, so we need to format it to valid JSON.
-          Don't change anything in the content of the HTML fragment (if it is a html fragment), except if you see obvious errors that needs to be fixed, your core task is just to format it to valid JSON.`,
+          content: systemPrompt,
         },
-        {
-          role: "user",
-          content: initialResponse,
-        },
+        ...history.map(msg => ({
+          role: msg.role,
+          content: msg.content
+        })),
+        { role: "user", content: message },
       ],
       model: "llama-3.3-70b-versatile",
       temperature: 0.7,
@@ -129,10 +93,10 @@ export const sendMessage = async (
       }
     });
 
-    console.log("Groq formatting response:", chatCompletion.choices[0]?.message?.content);
+    console.log("Groq response:", chatCompletion.choices[0]?.message?.content);
     return JSON.parse(chatCompletion.choices[0]?.message?.content || "{}");
   } catch (error) {
-    console.error("Error in final Groq formatting:", error);
+    console.error("Error in Groq fallback:", error);
     return {
       responsetype: "text",
       response: "Sorry, there was an error processing your request.",

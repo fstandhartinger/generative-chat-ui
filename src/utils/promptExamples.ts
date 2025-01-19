@@ -1,5 +1,5 @@
 export const HTML_EXAMPLES = {
-  southeastAsia: `<div id="travel-weather-map-container" style="width: 100%; height: 100vh; position: relative; font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;">
+  southeastAsia: `<div id="travel-weather-map-container" style="width: 100%; position: relative; font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;">
     <!-- Map and controls container -->
     <div id="map" style="width: 100%; height: 600px;"></div>
     
@@ -40,6 +40,7 @@ export const HTML_EXAMPLES = {
     </style>
 
     <script>
+        console.log("Hello from the script tag! (this tag must stay in the script, so that the user can see if the script was executed)");
         // Weather data for Southeast Asian destinations in August
         const locations = [
             {
@@ -278,12 +279,12 @@ export const HTML_EXAMPLES = {
             </select>
         </div>
 
-        <button onclick="calculateSalary()">Calculate Net Salary</button>
+        <button id="calculateButton">Calculate Net Salary</button>
 
         <div id="net-result"></div>
 
         <script>
-            function calculateSalary() {
+            document.getElementById('calculateButton').addEventListener('click', function() {
                 const grossIncome = parseFloat(document.getElementById('grossIncome').value);
                 const taxClass = document.getElementById('taxClass').value;
                 const churchTax = document.getElementById('churchTax').value;
@@ -368,7 +369,7 @@ export const HTML_EXAMPLES = {
                     </div>
                 \`;
                 resultDiv.classList.add('visible');
-            }
+            });
         </script>
     </div>`,
 

@@ -9,6 +9,65 @@ interface Message {
   content: string | React.ReactNode;
 }
 
+const AssistantResponse = ({ content }: { content: string }) => {
+  useEffect(() => {
+    // Create a temporary container
+    const container = document.createElement('div');
+    container.innerHTML = content;
+    
+    // Find all script tags
+    const scripts = container.getElementsByTagName('script');
+    
+    // Execute each script
+    Array.from(scripts).forEach(script => {
+      const newScript = document.createElement('script');
+      
+      // Copy all attributes
+      Array.from(script.attributes).forEach(attr => {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      
+      // Execute script after a small delay to ensure DOM is ready
+      const scriptContent = script.innerHTML;
+      newScript.innerHTML = `
+        setTimeout(() => {
+          try {
+            ${scriptContent}
+          } catch (error) {
+            console.error('Error executing script:', error);
+          }
+        }, 100);
+      `;
+      
+      // Add the script to the document body
+      document.body.appendChild(newScript);
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(newScript);
+      }, 1000);
+    });
+
+    // Add the HTML content
+    const contentDiv = document.createElement('div');
+    contentDiv.innerHTML = content;
+    // Remove script tags from the content to prevent double execution
+    Array.from(contentDiv.getElementsByTagName('script')).forEach(script => script.remove());
+    
+    return () => {
+      // Cleanup any remaining scripts on unmount
+      const scripts = document.getElementsByTagName('script');
+      Array.from(scripts).forEach(script => {
+        if (script.innerHTML.includes('setTimeout')) {
+          script.remove();
+        }
+      });
+    };
+  }, [content]);
+
+  return <div dangerouslySetInnerHTML={{ __html: content }} />;
+};
+
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +105,7 @@ const Index = () => {
         updatedMessages[updatedMessages.length - 1] = {
           role: "assistant",
           content: response.responsetype === "html" 
-            ? <div dangerouslySetInnerHTML={{ __html: response.response }} />
+            ? <AssistantResponse content={response.response} />
             : response.response
         };
         return updatedMessages;
