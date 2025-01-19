@@ -50,31 +50,27 @@ export const sendMessage = async (
           { role: "user", content: message }
         ],
         tools: [{
-          function: {
-            name: "generate_response",
-            description: "Generate either a text or HTML response",
-            parameters: {
-              type: "object",
-              properties: {
-                responsetype: {
-                  type: "string",
-                  enum: ["text", "html"],
-                  description: "The type of response to generate"
-                },
-                response: {
-                  type: "string",
-                  description: "The actual response content, either plain text or HTML"
-                }
+          name: "generate_response",
+          description: "Generate either a text or HTML response",
+          parameters: {
+            type: "object",
+            properties: {
+              responsetype: {
+                type: "string",
+                enum: ["text", "html"],
+                description: "The type of response to generate"
               },
-              required: ["responsetype", "response"]
-            }
+              response: {
+                type: "string",
+                description: "The actual response content, either plain text or HTML"
+              }
+            },
+            required: ["responsetype", "response"]
           }
         }],
-        tool_choice: { 
+        tool_choice: {
           type: "tool",
-          tool: {
-            name: "generate_response"
-          }
+          name: "generate_response"
         }
       });
 
