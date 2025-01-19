@@ -46,16 +46,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
 
   const examples = [
     {
-      shortText: "Welche Regionen in Südostasien eignen sich für Reisen im August?",
-      fullText: "Welche Regionen in Südostasien eignen sich für Reisen im August? Ich möchte wissen, welche Gebiete zu dieser Zeit günstige Wetterbedingungen haben. Wichtige Faktoren sind dabei Niederschlag (Monsunzeit), Temperatur und Luftfeuchtigkeit. Ich interessiere mich besonders für eine Übersicht der Regionen, die ideal (grün), akzeptabel (gelb) oder ungünstig (rot) für Reisen sind, mit detaillierten Informationen zu den jeweiligen Wetterbedingungen."
+      shortText: "Best regions to visit in Southeast Asia in August...",
+      fullText: "Best regions to visit in Southeast Asia in August? I need to know which areas have favorable weather conditions during this time. Important factors include rainfall (monsoon season), temperature, and humidity. I'm particularly interested in an overview of regions that are ideal (green), acceptable (yellow), or unfavorable (red) for travel, with detailed information about the respective weather conditions."
     },
     {
-      shortText: "Musikstücke für Playlist bewerten mit Kriterien wie Melodie, Gesang und Beat...",
-      fullText: "Musikstücke für Playlist bewerten mit Kriterien wie Melodie, Gesang und Beat. Ich muss für jedes Musikstück eine kurze Bewertung erstellen, die zu einer Entscheidung führt, ob das Stück in meine Spotify-Playlist aufgenommen wird. Dabei möchte ich verschiedene Aspekte wie Melodie, Gesang, Beat und Lyrics einzeln bewerten können und am Ende zu einem klaren Urteil (Aufnehmen oder Ablehnen) kommen, das durch die Einzelbewertungen begründet wird."
+      shortText: "Help me evaluate songs for my playlist based on melody, vocals...",
+      fullText: "Help me evaluate songs for my playlist based on melody, vocals, and beat. I need to create a brief assessment for each song that leads to a decision whether to include it in my Spotify playlist. I want to evaluate different aspects like melody, vocals, beat, and lyrics individually and arrive at a clear verdict (accept or reject) that is justified by the individual ratings."
     },
     {
-      shortText: "Wie viel Netto bleibt von meinem Brutto-Gehalt nach deutschem Steuerrecht?",
-      fullText: "Wie viel Netto bleibt von meinem Brutto-Gehalt nach deutschem Steuerrecht? Ich möchte verstehen, wie viel von meinem Brutto-Jahresgehalt nach allen Abzügen übrig bleibt. Dabei sind Faktoren wie meine Steuerklasse, ob ich Kirchensteuer zahle und andere relevante Aspekte zu berücksichtigen. Ich brauche eine Aufschlüsselung aller Abzüge (Einkommensteuer, Solidaritätszuschlag, Krankenversicherung, etc.) und den resultierenden monatlichen Netto-Betrag."
+      shortText: "Calculate net salary from gross income in Germany...",
+      fullText: "Calculate net salary from gross income in Germany? I want to understand how much of my gross annual salary remains after all deductions. Factors to consider include my tax class, whether I pay church tax, and other relevant aspects. I need a breakdown of all deductions (income tax, solidarity surcharge, health insurance, etc.) and the resulting monthly net amount."
     }
   ];
 
