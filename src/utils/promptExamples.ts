@@ -253,107 +253,193 @@ export const HTML_EXAMPLES = {
     </script>
 </div>`,
 
-  songEvaluation: `<div id="song-evaluation" class="p-6 bg-gray-800 rounded-lg">
-    <div class="space-y-4">
-      <div id="evaluation-form">
-        <h3 class="text-xl font-bold text-gray-200 mb-4">Song Evaluation</h3>
-        <div class="space-y-4">
-          <div>
-            <label class="block text-gray-200 mb-2">Melody (1-10)</label>
-            <input type="number" id="melody" min="1" max="10" class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200" />
-          </div>
-          <div>
-            <label class="block text-gray-200 mb-2">Vocals (1-10)</label>
-            <input type="number" id="vocals" min="1" max="10" class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200" />
-          </div>
-          <div>
-            <label class="block text-gray-200 mb-2">Beat (1-10)</label>
-            <input type="number" id="beat" min="1" max="10" class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200" />
-          </div>
-          <div>
-            <label class="block text-gray-200 mb-2">Notes</label>
-            <textarea id="notes" rows="3" class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200"></textarea>
-          </div>
-          <div class="flex space-x-4">
-            <button onclick="evaluateSong('accept')" class="flex-1 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-              Accept
-            </button>
-            <button onclick="evaluateSong('reject')" class="flex-1 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-              Reject
-            </button>
-          </div>
-        </div>
-      </div>
-      <div id="evaluation-result" class="mt-4 p-4 bg-gray-700 rounded hidden">
-        <!-- GROQ API results will be shown here -->
-      </div>
-    </div>
-    <script>
-      async function evaluateSong(decision) {
-        const melody = document.getElementById('melody').value;
-        const vocals = document.getElementById('vocals').value;
-        const beat = document.getElementById('beat').value;
-        const notes = document.getElementById('notes').value;
-        
-        if (!melody || !vocals || !beat) {
-          alert('Please rate all aspects of the song');
-          return;
+  songEvaluation: `<div id="songEvaluator">
+    <style>
+        #songEvaluator {
+            background-color: #343541;
+            color: #ECECF1;
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 2rem auto;
         }
-        
-        const resultDiv = document.getElementById('evaluation-result');
-        resultDiv.innerHTML = '<p class="text-gray-200">Analyzing song...</p>';
-        resultDiv.classList.remove('hidden');
-        
-        try {
-          const response = await fetch('https://api.groq.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Bearer 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',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              model: "llama-3.3-70b-versatile",
-              messages: [
-                {
-                  role: "system",
-                  content: "You are a music review assistant. Analyze the song ratings and provide a brief justification for the user's decision."
-                },
-                {
-                  role: "user",
-                  content: \`Analyze this song evaluation:
-                    Melody: \${melody}/10
-                    Vocals: \${vocals}/10
-                    Beat: \${beat}/10
-                    Notes: \${notes}
-                    Decision: \${decision}\`
-                }
-              ]
-            })
-          });
-          
-          const data = await response.json();
-          const analysis = data.choices[0].message.content;
-          
-          resultDiv.innerHTML = \`
-            <div class="space-y-2 text-gray-200">
-              <p class="font-bold \${decision === 'accept' ? 'text-green-500' : 'text-red-500'}">
-                \${decision.toUpperCase()}
-              </p>
-              <p>\${analysis}</p>
-              <div class="mt-4">
-                <p>Ratings:</p>
-                <ul class="list-disc list-inside">
-                  <li>Melody: \${melody}/10</li>
-                  <li>Vocals: \${vocals}/10</li>
-                  <li>Beat: \${beat}/10</li>
-                </ul>
-              </div>
+
+        #songEvaluator h2 {
+            color: #FFFFFF;
+            margin-bottom: 1.5rem;
+        }
+
+        #songEvaluator .category {
+            margin-bottom: 1.5rem;
+            background-color: #444654;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        #songEvaluator label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        #songEvaluator .radio-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        #songEvaluator .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        #songEvaluator .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        #songEvaluator button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        #songEvaluator button:hover {
+            opacity: 0.9;
+        }
+
+        #songEvaluator #acceptBtn {
+            background-color: #19C37D;
+            color: white;
+        }
+
+        #songEvaluator #rejectBtn {
+            background-color: #DC2626;
+            color: white;
+        }
+
+        #songEvaluator #result {
+            margin-top: 1.5rem;
+            white-space: pre-wrap;
+            background-color: #444654;
+            padding: 1rem;
+            border-radius: 6px;
+            display: none;
+        }
+    </style>
+
+    <h2>Song Evaluation Form</h2>
+    
+    <div class="category">
+        <label>Melody:</label>
+        <div class="radio-group">
+            <div class="radio-option">
+                <input type="radio" name="melody" value="good" id="melodyGood">
+                <label for="melodyGood">Good</label>
             </div>
-          \`;
-        } catch (error) {
-          resultDiv.innerHTML = '<p class="text-red-500">Error analyzing song. Please try again.</p>';
-        }
-      }
+            <div class="radio-option">
+                <input type="radio" name="melody" value="bad" id="melodyBad">
+                <label for="melodyBad">Bad</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="category">
+        <label>Vocals:</label>
+        <div class="radio-group">
+            <div class="radio-option">
+                <input type="radio" name="vocals" value="good" id="vocalsGood">
+                <label for="vocalsGood">Good</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" name="vocals" value="bad" id="vocalsBad">
+                <label for="vocalsBad">Bad</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="category">
+        <label>Beat:</label>
+        <div class="radio-group">
+            <div class="radio-option">
+                <input type="radio" name="beat" value="good" id="beatGood">
+                <label for="beatGood">Good</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" name="beat" value="bad" id="beatBad">
+                <label for="beatBad">Bad</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button id="acceptBtn">Accept</button>
+        <button id="rejectBtn">Reject</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        const generatePrompt = (melody, vocals, beat, decision) => {
+            return \`Create a polite \${decision} of the song that has applied to get taken into my spotify playlist. Include the information that I think the melody is \${melody}, the vocals are \${vocals} and the beat is \${beat}.\`;
+        };
+
+        const fetchResponse = async (prompt) => {
+            try {
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer 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'
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        model: 'llama-3.3-70b-versatile',
+                        temperature: 1,
+                        max_completion_tokens: 1024,
+                        top_p: 1,
+                        stream: false,
+                        stop: null
+                    })
+                });
+
+                const data = await response.json();
+                return data.choices[0].message.content;
+            } catch (error) {
+                return 'Error generating response. Please try again.';
+            }
+        };
+
+        const handleDecision = async (decision) => {
+            const melody = document.querySelector('input[name="melody"]:checked')?.value;
+            const vocals = document.querySelector('input[name="vocals"]:checked')?.value;
+            const beat = document.querySelector('input[name="beat"]:checked')?.value;
+
+            if (!melody || !vocals || !beat) {
+                alert('Please rate all categories before making a decision.');
+                return;
+            }
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Generating response...';
+
+            const prompt = generatePrompt(melody, vocals, beat, decision);
+            const response = await fetchResponse(prompt);
+            resultDiv.textContent = response;
+        };
+
+        document.getElementById('acceptBtn').addEventListener('click', () => handleDecision('acceptance'));
+        document.getElementById('rejectBtn').addEventListener('click', () => handleDecision('rejection'));
     </script>
 </div>`
 };
@@ -393,3 +479,4 @@ Format your response as a JSON object:
   "responsetype": "text" or "html",
   "response": "your response content"
 }`;
+
