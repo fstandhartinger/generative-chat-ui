@@ -85,7 +85,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
                 <DialogHeader>
                   <DialogTitle>Set Anthropic API Key</DialogTitle>
                   <DialogDescription className="text-gray-300">
-                    Enter your Anthropic API key to use Claude 3 Sonnet. Your key will be stored only on your device and never transmitted to our servers.
+                    Enter your Anthropic API key to use Claude 3.5 Sonnet (New). Your key will be stored only on your device and never transmitted to our servers.
                     Without an API key, the app will fall back to a limited free model with strong rate limits.
                   </DialogDescription>
                 </DialogHeader>
@@ -117,7 +117,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
                 onClick={() => {
                   setMessage(example.fullText);
                 }}
-                className="px-4 py-2 bg-gray-800 text-gray-200 rounded-full text-sm hover:bg-gray-700 transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px] md:max-w-[300px]"
+                className="px-4 py-2 bg-gray-800 text-gray-200 rounded-full text-sm hover:bg-gray-700 transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[190px] md:max-w-[290px]"
                 title={example.fullText}
               >
                 {example.shortText}
