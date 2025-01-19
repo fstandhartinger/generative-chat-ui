@@ -180,78 +180,197 @@ export const HTML_EXAMPLES = {
     </script>
 </div>`,
 
-  germanSalary: `<div id="salary-calculator" class="p-6 bg-gray-800 rounded-lg">
-    <div class="space-y-4">
-      <div>
-        <label for="grossSalary" class="block text-gray-200">Annual Gross Salary (€)</label>
-        <input type="number" id="grossSalary" class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200" />
-      </div>
-      <div>
-        <label for="taxClass" class="block text-gray-200">Tax Class</label>
-        <select id="taxClass" class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200">
-          <option value="1">Class 1</option>
-          <option value="2">Class 2</option>
-          <option value="3">Class 3</option>
-          <option value="4">Class 4</option>
-          <option value="5">Class 5</option>
-          <option value="6">Class 6</option>
-        </select>
-      </div>
-      <div>
-        <label class="flex items-center space-x-2">
-          <input type="checkbox" id="churchTax" class="w-4 h-4 bg-gray-700 border-gray-600 rounded" />
-          <span class="text-gray-200">Church Tax</span>
-        </label>
-      </div>
-      <button onclick="calculateSalary()" class="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-        Calculate
-      </button>
-      <div id="result" class="mt-4 p-4 bg-gray-700 rounded hidden">
-        <!-- Results will be inserted here -->
-      </div>
-    </div>
-    <script>
-      function calculateSalary() {
-        const grossSalary = parseFloat(document.getElementById('grossSalary').value);
-        const taxClass = document.getElementById('taxClass').value;
-        const churchTax = document.getElementById('churchTax').checked;
+  germanSalary: `<div id="salary-calculator">
+        <style>
+            #salary-calculator {
+                font-family: system-ui, -apple-system, sans-serif;
+                background-color: #1a1a1a;
+                color: #ffffff;
+                padding: 2rem;
+                border-radius: 8px;
+                max-width: 600px;
+                margin: 2rem auto;
+            }
+            #salary-calculator h2 {
+                color: #ffffff;
+                margin-bottom: 1.5rem;
+            }
+            #salary-calculator .form-group {
+                margin-bottom: 1rem;
+            }
+            #salary-calculator label {
+                display: block;
+                margin-bottom: 0.5rem;
+                color: #e5e5e5;
+            }
+            #salary-calculator select,
+            #salary-calculator input {
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid #333;
+                border-radius: 4px;
+                background: #2d2d2d;
+                color: #ffffff;
+                margin-bottom: 1rem;
+            }
+            #salary-calculator button {
+                background-color: #10a37f;
+                color: white;
+                padding: 0.75rem 1.5rem;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                width: 100%;
+                font-size: 1rem;
+            }
+            #salary-calculator button:hover {
+                background-color: #0e906f;
+            }
+            #net-result {
+                margin-top: 1.5rem;
+                padding: 1rem;
+                background-color: #2d2d2d;
+                border-radius: 4px;
+                display: none;
+            }
+            #net-result.visible {
+                display: block;
+            }
+            .deduction-item {
+                display: flex;
+                justify-content: space-between;
+                margin: 0.5rem 0;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid #404040;
+            }
+            .total {
+                margin-top: 1rem;
+                padding-top: 1rem;
+                border-top: 2px solid #404040;
+                font-weight: bold;
+            }
+        </style>
+
+        <h2>German Salary Calculator</h2>
         
-        if (!grossSalary || isNaN(grossSalary)) {
-          alert('Please enter a valid gross salary');
-          return;
-        }
-        
-        // Simplified German tax calculation (example rates)
-        const incomeTaxRate = 0.42; // 42% for high earners
-        const solidarityRate = 0.055; // 5.5%
-        const churchTaxRate = 0.09; // 9%
-        const socialSecurityRate = 0.20; // 20% total for health, pension, etc.
-        
-        const incomeTax = grossSalary * incomeTaxRate;
-        const solidarityTax = incomeTax * solidarityRate;
-        const churchTaxAmount = churchTax ? incomeTax * churchTaxRate : 0;
-        const socialSecurity = Math.min(grossSalary * socialSecurityRate, 15000); // Cap at 15,000€
-        
-        const totalDeductions = incomeTax + solidarityTax + churchTaxAmount + socialSecurity;
-        const netSalary = grossSalary - totalDeductions;
-        
-        const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = \`
-          <h3 class="text-xl font-bold text-gray-200 mb-3">Annual Breakdown</h3>
-          <div class="space-y-2 text-gray-200">
-            <p>Gross Salary: €\${grossSalary.toFixed(2)}</p>
-            <p>Income Tax: €\${incomeTax.toFixed(2)}</p>
-            <p>Solidarity Tax: €\${solidarityTax.toFixed(2)}</p>
-            \${churchTax ? \`<p>Church Tax: €\${churchTaxAmount.toFixed(2)}</p>\` : ''}
-            <p>Social Security: €\${socialSecurity.toFixed(2)}</p>
-            <p class="text-lg font-bold mt-4">Net Salary: €\${netSalary.toFixed(2)}</p>
-            <p class="text-sm text-gray-400">Monthly Net: €\${(netSalary / 12).toFixed(2)}</p>
-          </div>
-        \`;
-        resultDiv.classList.remove('hidden');
-      }
-    </script>
-</div>`,
+        <div class="form-group">
+            <label for="grossIncome">Annual Gross Income (€)</label>
+            <input type="number" id="grossIncome" min="0" step="1000" value="50000">
+        </div>
+
+        <div class="form-group">
+            <label for="taxClass">Tax Class</label>
+            <select id="taxClass">
+                <option value="1">Class 1 (Single)</option>
+                <option value="2">Class 2 (Single Parent)</option>
+                <option value="3">Class 3 (Married, main earner)</option>
+                <option value="4">Class 4 (Married, similar income)</option>
+                <option value="5">Class 5 (Married, secondary earner)</option>
+                <option value="6">Class 6 (Multiple jobs)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="churchTax">Church Tax</label>
+            <select id="churchTax">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+            </select>
+        </div>
+
+        <button onclick="calculateSalary()">Calculate Net Salary</button>
+
+        <div id="net-result"></div>
+
+        <script>
+            function calculateSalary() {
+                const grossIncome = parseFloat(document.getElementById('grossIncome').value);
+                const taxClass = document.getElementById('taxClass').value;
+                const churchTax = document.getElementById('churchTax').value;
+
+                // Simplified tax calculation (approximate values)
+                const monthlyGross = grossIncome / 12;
+                
+                // Social Security Contributions (approximate rates)
+                const pensionInsurance = monthlyGross * 0.093;
+                const healthInsurance = monthlyGross * 0.073;
+                const unemploymentInsurance = monthlyGross * 0.012;
+                const nursingCareInsurance = monthlyGross * 0.015;
+
+                // Income Tax (simplified progressive calculation)
+                let incomeTaxRate;
+                if (grossIncome <= 9744) incomeTaxRate = 0;
+                else if (grossIncome <= 57918) incomeTaxRate = 0.25;
+                else if (grossIncome <= 274612) incomeTaxRate = 0.42;
+                else incomeTaxRate = 0.45;
+
+                const incomeTax = monthlyGross * incomeTaxRate;
+                
+                // Solidarity Surcharge (5.5% of income tax if applicable)
+                const solidarityTax = incomeTax > 972.5 ? incomeTax * 0.055 : 0;
+                
+                // Church Tax if applicable (8-9% of income tax)
+                const churchTaxAmount = churchTax === 'yes' ? incomeTax * 0.08 : 0;
+
+                // Total deductions
+                const totalDeductions = 
+                    pensionInsurance + 
+                    healthInsurance + 
+                    unemploymentInsurance + 
+                    nursingCareInsurance + 
+                    incomeTax + 
+                    solidarityTax + 
+                    churchTaxAmount;
+
+                const netSalary = monthlyGross - totalDeductions;
+
+                // Display results
+                const resultDiv = document.getElementById('net-result');
+                resultDiv.innerHTML = \`
+                    <h3>Monthly Breakdown</h3>
+                    <div class="deduction-item">
+                        <span>Gross Salary:</span>
+                        <span>€\${monthlyGross.toFixed(2)}</span>
+                    </div>
+                    <div class="deduction-item">
+                        <span>Pension Insurance:</span>
+                        <span>-€\${pensionInsurance.toFixed(2)}</span>
+                    </div>
+                    <div class="deduction-item">
+                        <span>Health Insurance:</span>
+                        <span>-€\${healthInsurance.toFixed(2)}</span>
+                    </div>
+                    <div class="deduction-item">
+                        <span>Unemployment Insurance:</span>
+                        <span>-€\${unemploymentInsurance.toFixed(2)}</span>
+                    </div>
+                    <div class="deduction-item">
+                        <span>Nursing Care Insurance:</span>
+                        <span>-€\${nursingCareInsurance.toFixed(2)}</span>
+                    </div>
+                    <div class="deduction-item">
+                        <span>Income Tax:</span>
+                        <span>-€\${incomeTax.toFixed(2)}</span>
+                    </div>
+                    <div class="deduction-item">
+                        <span>Solidarity Surcharge:</span>
+                        <span>-€\${solidarityTax.toFixed(2)}</span>
+                    </div>
+                    \${churchTax === 'yes' ? \`
+                    <div class="deduction-item">
+                        <span>Church Tax:</span>
+                        <span>-€\${churchTaxAmount.toFixed(2)}</span>
+                    </div>
+                    \` : ''}
+                    <div class="deduction-item total">
+                        <span>Net Salary:</span>
+                        <span>€\${netSalary.toFixed(2)}</span>
+                    </div>
+                \`;
+                resultDiv.classList.add('visible');
+            }
+        </script>
+    </div>`,
 
   songEvaluation: `<div id="songEvaluator">
     <style>
@@ -479,4 +598,5 @@ Format your response as a JSON object:
   "responsetype": "text" or "html",
   "response": "your response content"
 }`;
+
 
