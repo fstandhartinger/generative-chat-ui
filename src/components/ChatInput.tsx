@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendHorizontal, RefreshCw, Key } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 
 interface ChatInputProps {
@@ -20,7 +20,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
 
   useEffect(() => {
     const savedKey = localStorage.getItem('ANTHROPIC_API_KEY');
-    if (savedKey) {
+    if (!savedKey) {
+      toast({
+        title: "Anthropic API Key Required",
+        description: "Please click the 'Anthropic API Key' button to set up your API key. Without it, the app will use a limited free model.",
+        variant: "destructive",
+        duration: 10000,
+      });
+    } else {
       setApiKey(savedKey);
     }
   }, []);
@@ -77,6 +84,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
               <DialogContent className="bg-gray-800 text-gray-200">
                 <DialogHeader>
                   <DialogTitle>Set Anthropic API Key</DialogTitle>
+                  <DialogDescription className="text-gray-300">
+                    Enter your Anthropic API key to use Claude 3 Sonnet. Your key will be stored only on your device and never transmitted to our servers.
+                    Without an API key, the app will fall back to a limited free model with strong rate limits.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
                   <Input
