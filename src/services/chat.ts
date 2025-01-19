@@ -2,8 +2,9 @@ import Groq from "groq-sdk";
 import { Anthropic } from '@anthropic-ai/sdk';
 import { getSystemPrompt } from '@/utils/promptExamples';
 
-const groq = new Groq({
-  apiKey: "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",
+//apiKey: "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",
+const groq = new Groq({  
+  apiKey: "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",
   dangerouslyAllowBrowser: true,
 });
 
