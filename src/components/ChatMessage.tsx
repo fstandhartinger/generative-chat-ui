@@ -1,12 +1,14 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
 
 interface ChatMessageProps {
   role: "user" | "assistant";
   content: string | React.ReactNode;
+  isLoading?: boolean;
 }
 
-export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content }) => {
+export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, isLoading }) => {
   return (
     <div
       className={cn(
@@ -24,7 +26,14 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content }) => {
           {role === "assistant" ? "AI" : "U"}
         </div>
         <div className="flex-1 space-y-2 overflow-hidden">
-          {typeof content === "string" ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              <div className="h-4 w-full">
+                <Progress value={undefined} className="h-1" />
+              </div>
+              <p className="text-gray-400 text-sm">AI is thinking...</p>
+            </div>
+          ) : typeof content === "string" ? (
             <p className="text-gray-200 leading-relaxed">{content}</p>
           ) : (
             content

@@ -31,7 +31,7 @@ const Index = () => {
     try {
       setIsLoading(true);
       const newMessages = [...messages, { role: "user" as const, content: message }];
-      setMessages(newMessages);
+      setMessages([...newMessages, { role: "assistant", content: "" }]);
 
       const history = newMessages.map(({ role, content }) => ({
         role,
@@ -40,26 +40,21 @@ const Index = () => {
 
       const response = await sendMessage(message, history);
       
-      if (response.responsetype === "html") {
-        setMessages([
-          ...newMessages,
-          {
-            role: "assistant" as const,
-            content: (
-              <div
-                dangerouslySetInnerHTML={{ __html: response.response }}
-              />
-            ),
-          },
-        ]);
-      } else {
-        setMessages([
-          ...newMessages,
-          { role: "assistant" as const, content: response.response },
-        ]);
-      }
+      // Update the last message (remove loading state and set content)
+      setMessages(currentMessages => {
+        const updatedMessages = [...currentMessages];
+        updatedMessages[updatedMessages.length - 1] = {
+          role: "assistant",
+          content: response.responsetype === "html" 
+            ? <div dangerouslySetInnerHTML={{ __html: response.response }} />
+            : response.response
+        };
+        return updatedMessages;
+      });
     } catch (error) {
       console.error("Error sending message:", error);
+      // Remove the loading message on error
+      setMessages(currentMessages => currentMessages.slice(0, -1));
       toast({
         title: "Error",
         description: "An error occurred while sending your message.",
@@ -85,6 +80,7 @@ const Index = () => {
               key={index}
               role={message.role}
               content={message.content}
+              isLoading={index === messages.length - 1 && isLoading}
             />
           ))
         )}
