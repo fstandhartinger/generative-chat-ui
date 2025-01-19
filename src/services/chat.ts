@@ -2,9 +2,17 @@ import Groq from "groq-sdk";
 import { Anthropic } from '@anthropic-ai/sdk';
 import { getSystemPrompt } from '@/utils/promptExamples';
 
-//apiKey: "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",
+const apiKeys = [
+  "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",
+  "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",
+  "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",
+  "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",
+  "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",
+  "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"
+];
+
 const groq = new Groq({  
-  apiKey: "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",
+  apiKey: apiKeys[Math.floor(Math.random() * apiKeys.length)],
   dangerouslyAllowBrowser: true,
 });
 
