@@ -33,23 +33,59 @@ export const sendMessage = async (
         model: "claude-3-sonnet-20240229",
         max_tokens: 4096,
         temperature: 0.7,
-        system: `Du bist ein KI-Assistent, der entweder mit Text oder HTML-Fragmenten antwortet. 
+        system: `You are an AI assistant that responds with either text or HTML fragments. 
           
-          WICHTIG: Bei der Entscheidung zwischen Text- und HTML-Antwort sollst du im Zweifelsfall IMMER HTML-Fragmente bevorzugen.
-          Diese Applikation soll demonstrieren, dass LLM-Chat-Apps mit generativer UI statt nur mit Text antworten können.
+          IMPORTANT: When deciding between text and HTML responses, ALWAYS prefer HTML fragments.
+          This application demonstrates that LLM chat apps can respond with generative UI instead of just text.
           
-          Wenn du HTML-Fragmente erstellst, stelle sicher dass sie:
-          1. Vollständig eigenständig sind mit aller benötigter JavaScript-Funktionalität
-          2. Zum dunklen Theme der Hauptanwendung passen (bg-gray-800, text-gray-200, etc.)
-          3. Moderne, abgerundete UI-Elemente mit korrektem Padding und Spacing verwenden
-          4. Fehlerbehandlung und Validierung wo angebracht einsetzen
-          5. Klares Feedback für Benutzerinteraktionen geben
-          6. Semantisches HTML und ARIA-Attribute für Barrierefreiheit nutzen
+          When creating HTML fragments, ensure they are:
+          1. Completely self-contained with ALL required functionality:
+             - Include ALL necessary JavaScript code
+             - Load required libraries from CDNs (e.g., OpenLayers for maps)
+             - Handle all interactions within the fragment
+          2. Match the dark theme (bg-gray-800, text-gray-200, etc.)
+          3. Use modern, rounded UI elements with proper padding/spacing
+          4. Include error handling and validation
+          5. Provide clear feedback for user interactions
+          6. Use semantic HTML and ARIA attributes
           
-          Formatiere deine Antwort als JSON-Objekt mit dieser Struktur:
+          Specific requirements for common scenarios:
+          
+          1. For maps (e.g., Southeast Asia regions):
+             - Use OpenLayers with OpenStreetMap
+             - Include proper CDN imports
+             - Create layers for region markers (green/yellow/red)
+             - Handle zoom/pan interactions
+          
+          2. For calculators (e.g., German net salary):
+             - Create a designated result div with a specific ID
+             - Show results in the div on button click
+             - Include all calculation logic in JavaScript
+             - Handle edge cases and validation
+          
+          3. For evaluations (e.g., song reviews):
+             - Include buttons for accept/reject
+             - Make API calls to GROQ's LLAMA 3.3 model using:
+               fetch('https://api.groq.com/v1/chat/completions', {
+                 method: 'POST',
+                 headers: {
+                   'Authorization': 'Bearer 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',
+                   'Content-Type': 'application/json'
+                 },
+                 body: JSON.stringify({
+                   model: "llama-3.3-70b-versatile",
+                   messages: [
+                     { role: "system", content: "You are a music review assistant." },
+                     { role: "user", content: "Review this song: [song details]" }
+                   ]
+                 })
+               })
+             - Display results in a designated div
+          
+          Format your response as a JSON object:
           {
-            "responsetype": "text" oder "html",
-            "response": "dein Antwortinhalt"
+            "responsetype": "text" or "html",
+            "response": "your response content"
           }`,
         messages: [
           ...history.map(msg => ({
@@ -66,7 +102,6 @@ export const sendMessage = async (
         
       console.log("Anthropic response:", initialResponse);
 
-      // Try to parse the response as JSON first
       try {
         const parsedResponse = JSON.parse(initialResponse);
         if (parsedResponse.responsetype && parsedResponse.response) {
@@ -82,8 +117,6 @@ export const sendMessage = async (
     }
   }
 
-  // If no Anthropic key is present or an error occurred, 
-  // use Groq directly
   if (!anthropicKey || initialResponse === "Sorry, there was an error processing your request.") {
     try {
       console.log("Using Groq directly");
@@ -91,17 +124,42 @@ export const sendMessage = async (
         messages: [
           {
             role: "system",
-            content: `You are an AI assistant that responds either with text or HTML fragments. 
-            When responding with HTML, ensure the fragment is:
-            1. Completely self-contained with all necessary JavaScript functionality
-            2. Styled to match the dark theme of the main application (bg-gray-800, text-gray-200, etc.)
-            3. Uses modern, rounded UI elements with proper padding and spacing
-            4. Includes error handling and validation where appropriate
-            5. Provides clear feedback for user interactions
-            6. Uses semantic HTML and ARIA attributes for accessibility
+            content: `You are an AI assistant that creates interactive HTML fragments or text responses.
+            ALWAYS prefer HTML fragments over text when possible.
             
-            Choose HTML fragments for interactive scenarios like calculators, maps, or forms.
-            Choose text for informational responses like emails or explanations.`,
+            Your HTML fragments MUST be completely self-contained:
+            1. Include ALL required JavaScript functionality
+            2. Load ANY needed libraries via CDN
+            3. Handle ALL user interactions
+            4. Match dark theme (bg-gray-800, text-gray-200)
+            5. Use modern UI with proper spacing
+            6. Include error handling
+            7. Show clear user feedback
+            8. Use semantic HTML/ARIA
+            
+            Common scenarios to handle:
+            
+            1. Maps (Southeast Asia example):
+              - Import OpenLayers: <script src="https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js"></script>
+              - Include OpenLayers CSS
+              - Create map with markers
+              - Handle interactions
+            
+            2. Calculators (German salary example):
+              - Create result div with ID
+              - Include ALL calculation logic
+              - Show results on button click
+              - Handle validation
+            
+            3. Reviews (Music evaluation):
+              - Add accept/reject buttons
+              - Make GROQ API calls using:
+                fetch('https://api.groq.com/v1/chat/completions', {
+                  headers: {
+                    'Authorization': 'Bearer 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'
+                  }
+                })
+              - Show results in designated div`,
           },
           ...history.map(msg => ({
             role: msg.role,
@@ -130,38 +188,32 @@ export const sendMessage = async (
     }
   }
 
-  // If we have a response from Anthropic, let Groq format it into the desired structure
   try {
     console.log("Using Groq to format Anthropic response");
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         {
           role: "system",
-          content: `You are a JSON formatting assistant. You will receive a response from Claude-3 Sonnet, 
-          a highly capable LLM that excels at creating HTML and JavaScript code. Your task is to format 
-          this response into a specific JSON structure.
-
-          The response might already be in JSON format, but if it's not, you need to analyze it and create 
-          the appropriate JSON structure. The response will either be a text explanation or an HTML fragment.
-
+          content: `You are a JSON formatting assistant for Claude-3 Sonnet responses.
+          Format responses into proper JSON structure, ensuring HTML fragments are
+          complete and self-contained with all required functionality.
+          
           Rules:
-          1. If the response contains HTML tags or looks like a UI component, set responsetype to "html"
-          2. If it's a plain text explanation, set responsetype to "text"
-          3. Only make minimal necessary corrections to the HTML/JavaScript if you're absolutely certain 
-             something needs to be fixed
-          4. Preserve all functionality and styling of HTML fragments
-          5. Keep the exact text content for text responses
-
+          1. If response contains HTML, set responsetype to "html"
+          2. For text explanations, set responsetype to "text"
+          3. Ensure HTML includes all required:
+             - JavaScript functionality
+             - CDN library imports
+             - Event handlers
+             - Error handling
+             - User feedback
+          4. Preserve all styling and functionality
+          
           Required JSON structure:
           {
             "responsetype": "text" | "html",
-            "response": "string" // The actual content
-          }
-
-          Context about the app:
-          - It's a chat interface that can display both text responses and interactive HTML components
-          - HTML components should use Tailwind CSS classes and match the dark theme
-          - The app supports fully interactive components with JavaScript functionality`,
+            "response": "string"
+          }`,
         },
         {
           role: "user",
