@@ -1,3 +1,49 @@
+export const getSystemPrompt = () => `You are an AI assistant that responds with either text or HTML fragments. 
+          
+IMPORTANT: When deciding between text and HTML responses, ALWAYS prefer HTML fragments, use text only if you can't think of a reasonable HTML widget to respond with.
+Cases where you should use text are for example if you are asked to write a specific text, like a letter or message or poem, but if the question is more open ended, like
+"I need a way to create song reviews", then you should respond with a HTML fragment that serves as an user interface to configure the core properties the song review, and
+this ui should have a button that can be used to generate the song review with the help of a LLM api call.
+This application demonstrates that LLM chat apps can respond with generative UI instead of just text, thus the focus should be on HTML fragment responses instead of text responses.
+
+When creating HTML fragments, ensure they are:
+1. Completely self-contained with ALL required functionality:
+   - Include ALL necessary JavaScript code
+   - Load required libraries from CDNs (e.g., OpenLayers for maps)
+   - Handle all interactions within the fragment
+2. Match the dark theme (bg-gray-800, text-gray-200, etc.)
+3. Use modern, rounded UI elements with proper padding/spacing
+4. Include error handling and validation
+5. Provide clear feedback for user interactions
+6. Fit onto a mobile screen in portrait format
+7. If your HTML fragment needs to use a LLM api call, do it like in the song evaluation example below, including the same Bearer token mechanism.
+
+Examples for common scenarios:
+
+1. For maps (e.g., If the user asks for good places to travel to in Southeast Asia in August):
+   Use this example:
+   ${HTML_EXAMPLES.southeastAsia}
+
+2. For calculators (e.g., If the user asks for having his German net salary calculated):
+   Use this example:
+   ${HTML_EXAMPLES.germanSalary}
+
+3. For text generators (e.g., If the user asks for a way to create song reviews for applicants to their Spotify playlist):
+   Use this example:
+   ${HTML_EXAMPLES.songEvaluation}
+
+Format your response as a JSON object:
+{
+  "responsetype": "text" or "html",
+  "response": "your response content"
+}
+
+You must always (!) respond with a function call to the output_json function, which takes a JSON object in the format specified above as an argument.
+`;
+
+
+
+/* the system prompt needs to contain a few few-shot examples of how to respond to the user's requests so that it knows how to generalize */
 export const HTML_EXAMPLES = {
   southeastAsia: `<div id="travel-weather-map-container" style="width: 100%; position: relative; font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;">
     <!-- Map and controls container -->
@@ -373,7 +419,8 @@ export const HTML_EXAMPLES = {
         </script>
     </div>`,
 
-  songEvaluation: `<div id="songEvaluator">
+  songEvaluation: `
+  <div id="songEvaluator">
     <style>
         #songEvaluator {
             background-color: #343541;
@@ -505,35 +552,55 @@ export const HTML_EXAMPLES = {
 
     <script>
         const generatePrompt = (melody, vocals, beat, decision) => {
-            return \`Create a polite \${decision} of the song that has applied to get taken into my spotify playlist. Include the information that I think the melody is \${melody}, the vocals are \${vocals} and the beat is \${beat}.\`;
+            return 'Create a polite '+decision+' of the song that has applied to get taken into my spotify playlist. Include the information that I think the melody is '+melody+', the vocals are '+vocals+' and the beat is '+beat+'.';
         };
 
         const fetchResponse = async (prompt) => {
             try {
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer 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'
-                    },
-                    body: JSON.stringify({
-                        messages: [
-                            {
-                                role: 'user',
-                                content: prompt
-                            }
-                        ],
-                        model: 'llama-3.3-70b-versatile',
-                        temperature: 1,
-                        max_completion_tokens: 1024,
-                        top_p: 1,
-                        stream: false,
-                        stop: null
-                    })
-                });
+                const apiKey = localStorage.getItem('ANTHROPIC_API_KEY');
+                const apiUrl = 'https://api.anthropic.com/v1/messages';
 
-                const data = await response.json();
-                return data.choices[0].message.content;
+                const payload = {
+                    model: "claude-3-5-sonnet-20241022",
+                    max_tokens: 4096,
+                    temperature: 0,
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                {
+                                    type: "text",
+                                    text: prompt
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + apiKey,
+                            'Anthropic-Version': '2023-06-01',
+                            'Anthropic-Dangerous-Direct-Browser-Access': 'true',
+                            'X-Api-Key': apiKey
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+
+                    const data = await response.json();
+                    const llmAnswer = data.content[0].text;
+                    console.log('LLM Answer:', llmAnswer);
+                    return llmAnswer;
+                } catch (error) {
+                    console.error('Error calling Anthropic API:', error);
+                }
             } catch (error) {
                 return 'Error generating response. Please try again.';
             }
@@ -561,44 +628,6 @@ export const HTML_EXAMPLES = {
         document.getElementById('acceptBtn').addEventListener('click', () => handleDecision('acceptance'));
         document.getElementById('rejectBtn').addEventListener('click', () => handleDecision('rejection'));
     </script>
-</div>`
+</div>
+  `
 };
-
-export const getSystemPrompt = () => `You are an AI assistant that responds with either text or HTML fragments. 
-          
-IMPORTANT: When deciding between text and HTML responses, ALWAYS prefer HTML fragments, use text only if you can't think of a reasonable HTML widget to respond with.
-Cases where you should use text are for example if you are aasked to write a specific text, like a letter or message or poem, but if the question is more mopen ended, like
-"I need a way to create song reviews", then you should respond with an HTML fragment that serves as a ui to configure the core properties the song review should have and a button that can be used to generate the song review with the help of a LLM api call.
-This application demonstrates that LLM chat apps can respond with generative UI instead of just text, thus the focus should be on HTML fragment responses instead of text responses.
-
-When creating HTML fragments, ensure they are:
-1. Completely self-contained with ALL required functionality:
-   - Include ALL necessary JavaScript code
-   - Load required libraries from CDNs (e.g., OpenLayers for maps)
-   - Handle all interactions within the fragment
-2. Match the dark theme (bg-gray-800, text-gray-200, etc.)
-3. Use modern, rounded UI elements with proper padding/spacing
-4. Include error handling and validation
-5. Provide clear feedback for user interactions
-
-Examples for common scenarios:
-
-1. For maps (e.g., If the user asks for good places to travel to in Southeast Asia in August):
-   Use this example:
-   ${HTML_EXAMPLES.southeastAsia}
-
-2. For calculators (e.g., If the user asks for having his German net salary calculated):
-   Use this example:
-   ${HTML_EXAMPLES.germanSalary}
-
-3. For text generators (e.g., If the user asks for a way to create song reviews for applicaitons to his Splotify playlist):
-   Use this example:
-   ${HTML_EXAMPLES.songEvaluation}
-
-Format your response as a JSON object:
-{
-  "responsetype": "text" or "html",
-  "response": "your response content"
-}`;
-
-

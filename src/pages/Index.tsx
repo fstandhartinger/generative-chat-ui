@@ -109,6 +109,7 @@ const Index = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
+  /*
   const showRateLimitToast = useCallback(() => {
     toast({
       variant: "destructive",
@@ -120,6 +121,7 @@ const Index = () => {
   useEffect(() => {
     showRateLimitToast();
   }, [showRateLimitToast]);
+  */
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
