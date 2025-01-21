@@ -4,7 +4,9 @@ import { ChatInput } from "@/components/ChatInput";
 import { sendMessage } from "@/services/chat";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Key } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 interface Message {
   role: "user" | "assistant";
@@ -110,20 +112,52 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-
-  /*
-  const showRateLimitToast = useCallback(() => {
-    toast({
-      variant: "destructive",
-      description: "Currently problems with rate limits",
-      duration: null // This makes it stay until manually dismissed
-    });
-  }, [toast]);
+  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
+  const [apiKeys, setApiKeys] = useState({
+    anthropic: "",
+    r1deepseek: "",
+    openai: "",
+    replicate: "",
+    serperdev: ""
+  });
 
   useEffect(() => {
-    showRateLimitToast();
-  }, [showRateLimitToast]);
-  */
+    // Load all saved API keys
+    const savedKeys = {
+      anthropic: localStorage.getItem('ANTHROPIC_API_KEY') || "",
+      r1deepseek: localStorage.getItem('R1DEEPSEEK_API_KEY') || "",
+      openai: localStorage.getItem('OPENAI_API_KEY') || "",
+      replicate: localStorage.getItem('REPLICATE_API_KEY') || "",
+      serperdev: localStorage.getItem('SERPERDEV_API_KEY') || ""
+    };
+    setApiKeys(savedKeys);
+  }, []);
+
+  const handleSaveApiKeys = () => {
+    if (!apiKeys.anthropic.trim()) {
+      toast({
+        title: "Error",
+        description: "Anthropic API key is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Save all API keys to localStorage
+    Object.entries(apiKeys).forEach(([key, value]) => {
+      if (value.trim()) {
+        localStorage.setItem(`${key.toUpperCase()}_API_KEY`, value.trim());
+      } else {
+        localStorage.removeItem(`${key.toUpperCase()}_API_KEY`);
+      }
+    });
+
+    setShowApiKeyDialog(false);
+    toast({
+      title: "API Keys Saved",
+      description: "Your API keys have been saved successfully.",
+    });
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -177,23 +211,101 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-chatbg text-gray-200">
-      {messages.length > 0 && (
-        <div className="fixed top-4 left-4 z-10">
+      {/* Top bar */}
+      <div className="h-14 border-b border-gray-800 bg-gray-900/50 backdrop-blur fixed top-0 left-0 right-0 z-10 flex items-center justify-between px-4">
+        {messages.length > 0 && (
           <Button
             onClick={handleNewChat}
-            variant="outline"
-            className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700"
+            variant="ghost"
+            size="sm"
+            className="text-gray-400 hover:text-gray-200"
           >
-            <RefreshCw className="mr-2 h-4 w-4" />
+            <RefreshCw className="h-4 w-4 mr-2" />
             New Chat
           </Button>
-        </div>
-      )}
-      
-      <div className={`h-[calc(100vh-var(--chat-input-height,0px))] overflow-y-auto ${messages.length === 0 ? 'flex items-center justify-center' : ''}`}>
+        )}
+        <div className="flex-1" />
+        <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-400 hover:text-gray-200"
+            >
+              <Key className="h-4 w-4 mr-2" />
+              API Keys
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-gray-800 text-gray-200 sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Configure API Keys</DialogTitle>
+              <DialogDescription className="text-gray-300">
+                Enter your API keys to unlock different capabilities. At minimum, the Anthropic API key is required.
+                Your keys will be stored only on your device and never transmitted to our servers.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Anthropic API Key (Required)</label>
+                <Input
+                  type="password"
+                  value={apiKeys.anthropic}
+                  onChange={(e) => setApiKeys(prev => ({ ...prev, anthropic: e.target.value }))}
+                  placeholder="Enter your Anthropic API key"
+                  className="bg-gray-700 border-gray-600 text-gray-200"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">R1 Deepseek API Key</label>
+                <Input
+                  type="password"
+                  value={apiKeys.r1deepseek}
+                  onChange={(e) => setApiKeys(prev => ({ ...prev, r1deepseek: e.target.value }))}
+                  placeholder="Enter your R1 Deepseek API key"
+                  className="bg-gray-700 border-gray-600 text-gray-200"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">OpenAI API Key</label>
+                <Input
+                  type="password"
+                  value={apiKeys.openai}
+                  onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
+                  placeholder="Enter your OpenAI API key"
+                  className="bg-gray-700 border-gray-600 text-gray-200"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Replicate API Key</label>
+                <Input
+                  type="password"
+                  value={apiKeys.replicate}
+                  onChange={(e) => setApiKeys(prev => ({ ...prev, replicate: e.target.value }))}
+                  placeholder="Enter your Replicate API key"
+                  className="bg-gray-700 border-gray-600 text-gray-200"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Serper.dev API Key</label>
+                <Input
+                  type="password"
+                  value={apiKeys.serperdev}
+                  onChange={(e) => setApiKeys(prev => ({ ...prev, serperdev: e.target.value }))}
+                  placeholder="Enter your Serper.dev API key"
+                  className="bg-gray-700 border-gray-600 text-gray-200"
+                />
+              </div>
+              <Button onClick={handleSaveApiKeys}>Save API Keys</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Main content with top padding for the fixed header */}
+      <div className={`pt-14 h-[calc(100vh-var(--chat-input-height,0px))] overflow-y-auto ${messages.length === 0 ? 'flex items-center justify-center' : ''}`}>
         {messages.length === 0 ? (
-          <div className="w-full max-w-3xl mx-auto px-4 flex flex-col items-center">
-            <h1 className="text-4xl font-bold text-gray-500 mb-8">
+          <div className="w-full max-w-3xl mx-auto px-4 flex flex-col items-center -mt-14">
+            <h1 className="text-4xl font-bold text-gray-500 mb-8 text-center">
               Generative UI Chat
             </h1>
             <div className="w-full">
@@ -202,7 +314,7 @@ const Index = () => {
                 isLoading={isLoading} 
                 onNewChat={handleNewChat}
                 showExamples={true}
-                className="relative"
+                className="relative bg-transparent"
               />
             </div>
           </div>
@@ -227,7 +339,7 @@ const Index = () => {
           isLoading={isLoading} 
           onNewChat={handleNewChat}
           showExamples={false}
-          className="fixed bottom-0 left-0 right-0"
+          className="fixed bottom-0 left-0 right-0 bg-chatbg/80 backdrop-blur"
         />
       )}
     </div>

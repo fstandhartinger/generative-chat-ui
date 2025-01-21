@@ -201,109 +201,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           document.documentElement.style.setProperty('--chat-input-height', `${totalHeight}px`);
         }
       }}>
-        <div className="flex flex-col space-y-4 mb-4">
-          {showExamples && (
-            <>
-              <div className="flex justify-end gap-2">
-                <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700"
-                    >
-                      <Key className="mr-2 h-4 w-4" />
-                      API Keys
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-gray-800 text-gray-200">
-                    <DialogHeader>
-                      <DialogTitle>Configure API Keys</DialogTitle>
-                      <DialogDescription className="text-gray-300">
-                        Enter your API keys to unlock different capabilities. At minimum, the Anthropic API key is required.
-                        Your keys will be stored only on your device and never transmitted to our servers.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex flex-col gap-4">
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">Anthropic API Key (Required)</label>
-                        <Input
-                          type="password"
-                          value={apiKeys.anthropic}
-                          onChange={(e) => setApiKeys(prev => ({ ...prev, anthropic: e.target.value }))}
-                          placeholder="Enter your Anthropic API key"
-                          className="bg-gray-700 border-gray-600 text-gray-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">R1 Deepseek API Key</label>
-                        <Input
-                          type="password"
-                          value={apiKeys.r1deepseek}
-                          onChange={(e) => setApiKeys(prev => ({ ...prev, r1deepseek: e.target.value }))}
-                          placeholder="Enter your R1 Deepseek API key"
-                          className="bg-gray-700 border-gray-600 text-gray-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">OpenAI API Key</label>
-                        <Input
-                          type="password"
-                          value={apiKeys.openai}
-                          onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
-                          placeholder="Enter your OpenAI API key"
-                          className="bg-gray-700 border-gray-600 text-gray-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">Replicate API Key</label>
-                        <Input
-                          type="password"
-                          value={apiKeys.replicate}
-                          onChange={(e) => setApiKeys(prev => ({ ...prev, replicate: e.target.value }))}
-                          placeholder="Enter your Replicate API key"
-                          className="bg-gray-700 border-gray-600 text-gray-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">Serper.dev API Key</label>
-                        <Input
-                          type="password"
-                          value={apiKeys.serperdev}
-                          onChange={(e) => setApiKeys(prev => ({ ...prev, serperdev: e.target.value }))}
-                          placeholder="Enter your Serper.dev API key"
-                          className="bg-gray-700 border-gray-600 text-gray-200"
-                        />
-                      </div>
-                      <Button onClick={handleSaveApiKeys}>Save API Keys</Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-                <Button
-                  onClick={onNewChat}
-                  variant="outline"
-                  className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700"
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  New Chat
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
-                {examples.map((example, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setMessage(example.fullText);
-                    }}
-                    className="px-4 py-2 bg-gray-800 text-gray-200 rounded-full text-sm hover:bg-gray-700 transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[190px] md:max-w-[290px]"
-                    title={example.fullText}
-                  >
-                    {example.shortText}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
         <form onSubmit={handleSubmit} className="flex gap-2">
           <div className="flex-1 relative">
             <Textarea
@@ -346,6 +243,26 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             <SendHorizontal className="h-4 w-4" />
           </Button>
         </form>
+
+        {showExamples && (
+          <div className="mt-8 space-y-4">
+            <div className="text-sm text-gray-400">Try an example:</div>
+            <div className="flex flex-wrap gap-3">
+              {examples.map((example, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setMessage(example.fullText);
+                  }}
+                  className="px-3 py-1.5 bg-gray-800/50 text-gray-400 hover:text-gray-200 rounded-lg text-sm transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-full"
+                  title={example.fullText}
+                >
+                  {example.shortText}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
