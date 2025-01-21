@@ -57,7 +57,6 @@ const getEnhancedSystemPrompt = () => {
   const basePrompt = getSystemPrompt();
   const serperKey = localStorage.getItem('SERPERDEV_API_KEY');
   const openaiKey = localStorage.getItem('OPENAI_API_KEY');
-  const replicateKey = localStorage.getItem('REPLICATE_API_KEY');
   const r1Key = localStorage.getItem('R1DEEPSEEK_API_KEY');
   
   let enhancedPrompt = basePrompt;
@@ -118,6 +117,23 @@ const getEnhancedSystemPrompt = () => {
       })
     });
 
+    // Image generation with DALL-E
+    const imageResponse = await fetch("https://api.openai.com/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + openaiKey
+      },
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt: "Your image generation prompt",
+        n: 1,
+        size: "1024x1024"
+      })
+    });
+    const imageResult = await imageResponse.json();
+    const imageUrl = imageResult.data[0].url; // URL of the generated image
+
     // Text-to-Speech
     const audioResponse = await fetch("https://api.openai.com/v1/audio/speech", {
       method: "POST",
@@ -145,28 +161,6 @@ const getEnhancedSystemPrompt = () => {
       },
       body: formData
     });`;
-  }
-
-  if (replicateKey) {
-    enhancedPrompt += `\n\nYou can use Replicate's APIs in your HTML fragments for image generation:
-    
-    const replicateKey = localStorage.getItem('REPLICATE_API_KEY');
-    const response = await fetch("https://api.replicate.com/v1/models/black-forest-labs/flux-dev/predictions", {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer " + replicateKey,
-        "Content-Type": "application/json",
-        "Prefer": "wait"
-      },
-      body: JSON.stringify({
-        input: {
-          prompt: "Your image generation prompt",
-          guidance: 3.5
-        }
-      })
-    });
-    const result = await response.json();
-    // result will contain array of image URLs`;
   }
 
   return enhancedPrompt;

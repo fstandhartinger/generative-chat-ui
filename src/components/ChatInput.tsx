@@ -24,13 +24,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const [message, setMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [randomExamples, setRandomExamples] = useState<typeof examples>([]);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [apiKeys, setApiKeys] = useState({
     anthropic: "",
     r1deepseek: "",
     openai: "",
-    replicate: "",
     serperdev: ""
   });
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
@@ -42,7 +43,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       anthropic: localStorage.getItem('ANTHROPIC_API_KEY') || "",
       r1deepseek: localStorage.getItem('R1DEEPSEEK_API_KEY') || "",
       openai: localStorage.getItem('OPENAI_API_KEY') || "",
-      replicate: localStorage.getItem('REPLICATE_API_KEY') || "",
       serperdev: localStorage.getItem('SERPERDEV_API_KEY') || ""
     };
     setApiKeys(savedKeys);
@@ -55,6 +55,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         duration: 10000,
       });
     }
+
+    // Initialize random examples
+    setRandomExamples(examples.sort(() => Math.random() - 0.5).slice(0, 2));
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -107,7 +110,27 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     {
       shortText: "Calculate net salary from gross income in Germany...",
       fullText: "Calculate net salary from gross income in Germany? I want to understand how much of my gross annual salary remains after all deductions. Factors to consider include my tax class, whether I pay church tax, and other relevant aspects. I need a breakdown of all deductions (income tax, solidarity surcharge, health insurance, etc.) and the resulting monthly net amount."
-    }
+    },
+    {
+      shortText: "I'd love to hear a short podcast about siamese cats",
+      fullText: "I'd love to hear a short podcast about siamese cats. Can you also generate a matching cover art image and make it show like a podcast player?"
+    },
+    {
+      shortText: "What's the time in Sydney?",
+      fullText: "What's the time in Sydney?"
+    },
+    {
+      shortText: "Can you explain me why PI is 3.14 in an interactive way?",
+      fullText: "Can you explain me why PI is 3.14 in an interactive way?"
+    },    
+    {
+      shortText: "I love to sing, can you measure in realtime which note i hit?",
+      fullText: "I love to sing, can you measure in realtime which note i hit?"
+    },        
+    {
+      shortText: "I want to play a game of tetris",
+      fullText: "I want to play a game of tetris"
+    },            
   ];
 
   const startRecording = async () => {
@@ -192,6 +215,18 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     }
   };
 
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [message]);
+
   return (
     <div className={`bg-chatbg border-t border-gray-700 p-4 ${className}`}>
       <div className="max-w-3xl mx-auto" ref={(el) => {
@@ -204,11 +239,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         <form onSubmit={handleSubmit} className="flex gap-2">
           <div className="flex-1 relative">
             <Textarea
+              ref={textareaRef}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => {
+                setMessage(e.target.value);
+              }}
               placeholder="Send a message..."
-              className="flex-1 bg-gray-800 border-gray-700 text-gray-200 resize-none pr-10"
-              rows={1}
+              className="flex-1 bg-gray-800 border-gray-700 text-gray-200 resize-none pr-10 min-h-[40px] max-h-[200px] overflow-y-auto scrollbar scrollbar-w-1 scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -248,7 +285,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           <div className="mt-8 space-y-4">
             <div className="text-sm text-gray-400">Try an example:</div>
             <div className="flex flex-wrap gap-3">
-              {examples.map((example, index) => (
+              {randomExamples.map((example, index) => (
                 <button
                   key={index}
                   onClick={() => {
