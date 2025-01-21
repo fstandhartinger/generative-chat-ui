@@ -32,7 +32,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
     // Load all saved API keys
     const savedKeys = {
       anthropic: localStorage.getItem('ANTHROPIC_API_KEY') || "",
-      r1deepseek: localStorage.getItem('R1_DEEPSEEK_API_KEY') || "",
+      r1deepseek: localStorage.getItem('R1DEEPSEEK_API_KEY') || "",
       openai: localStorage.getItem('OPENAI_API_KEY') || "",
       replicate: localStorage.getItem('REPLICATE_API_KEY') || "",
       serperdev: localStorage.getItem('SERPERDEV_API_KEY') || ""
@@ -51,6 +51,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // If this was triggered by Enter key, let the onKeyDown handler handle it
+    if (e.nativeEvent instanceof KeyboardEvent && e.nativeEvent.key === 'Enter') {
+      return;
+    }
     if (message.trim() && !isLoading) {
       onSend(message.trim());
       setMessage("");

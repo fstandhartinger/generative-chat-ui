@@ -58,13 +58,13 @@ const getEnhancedSystemPrompt = () => {
   const serperKey = localStorage.getItem('SERPERDEV_API_KEY');
   const openaiKey = localStorage.getItem('OPENAI_API_KEY');
   const replicateKey = localStorage.getItem('REPLICATE_API_KEY');
-  const r1Key = localStorage.getItem('R1_DEEPSEEK_API_KEY');
+  const r1Key = localStorage.getItem('R1DEEPSEEK_API_KEY');
   
   let enhancedPrompt = basePrompt;
 
   if (r1Key) {
     enhancedPrompt += `\n\nYou can and should use R1 Deepseek for LLM calls in your HTML fragments. Example:
-    const r1Key = localStorage.getItem('R1_DEEPSEEK_API_KEY');
+    const r1Key = localStorage.getItem('R1DEEPSEEK_API_KEY');
     const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -179,7 +179,7 @@ export const sendMessage = async (
   console.log("Sending message:", message);
   
   const anthropicKey = localStorage.getItem('ANTHROPIC_API_KEY');
-  const r1Key = localStorage.getItem('R1_DEEPSEEK_API_KEY');
+  const r1Key = localStorage.getItem('R1DEEPSEEK_API_KEY');
   
   if (!anthropicKey) {
     return {
@@ -212,8 +212,7 @@ export const sendMessage = async (
           ...history.map(msg => ({
             role: msg.role,
             content: msg.content
-          })),
-          { role: "user", content: message }
+          }))
         ]
       });
 
@@ -237,8 +236,7 @@ export const sendMessage = async (
         ...history.map(msg => ({
           role: msg.role,
           content: msg.content
-        })),
-        { role: "user", content: message }
+        }))
       ],
       tools: [
         {
