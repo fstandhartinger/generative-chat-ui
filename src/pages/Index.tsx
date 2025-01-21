@@ -3,6 +3,8 @@ import { ChatMessage } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
 import { sendMessage } from "@/services/chat";
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -175,30 +177,59 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-chatbg text-gray-200">
-      <div className="h-[calc(100vh-var(--chat-input-height,0px))] overflow-y-auto">
+      {messages.length > 0 && (
+        <div className="fixed top-4 left-4 z-10">
+          <Button
+            onClick={handleNewChat}
+            variant="outline"
+            className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            New Chat
+          </Button>
+        </div>
+      )}
+      
+      <div className={`h-[calc(100vh-var(--chat-input-height,0px))] overflow-y-auto ${messages.length === 0 ? 'flex items-center justify-center' : ''}`}>
         {messages.length === 0 ? (
-          <div className="h-full flex items-center justify-center">
-            <h1 className="text-4xl font-bold text-gray-500">
+          <div className="w-full max-w-3xl mx-auto px-4 flex flex-col items-center">
+            <h1 className="text-4xl font-bold text-gray-500 mb-8">
               Generative UI Chat
             </h1>
+            <div className="w-full">
+              <ChatInput 
+                onSend={handleSend} 
+                isLoading={isLoading} 
+                onNewChat={handleNewChat}
+                showExamples={true}
+                className="relative"
+              />
+            </div>
           </div>
         ) : (
-          messages.map((message, index) => (
-            <ChatMessage
-              key={index}
-              role={message.role}
-              content={message.content}
-              isLoading={index === messages.length - 1 && isLoading}
-            />
-          ))
+          <>
+            {messages.map((message, index) => (
+              <ChatMessage
+                key={index}
+                role={message.role}
+                content={message.content}
+                isLoading={index === messages.length - 1 && isLoading}
+              />
+            ))}
+            <div ref={messagesEndRef} />
+          </>
         )}
-        <div ref={messagesEndRef} />
       </div>
-      <ChatInput 
-        onSend={handleSend} 
-        isLoading={isLoading} 
-        onNewChat={handleNewChat}
-      />
+      
+      {messages.length > 0 && (
+        <ChatInput 
+          onSend={handleSend} 
+          isLoading={isLoading} 
+          onNewChat={handleNewChat}
+          showExamples={false}
+          className="fixed bottom-0 left-0 right-0"
+        />
+      )}
     </div>
   );
 };

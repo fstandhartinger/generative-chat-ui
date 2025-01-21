@@ -10,9 +10,17 @@ interface ChatInputProps {
   onSend: (message: string) => void;
   isLoading: boolean;
   onNewChat: () => void;
+  showExamples?: boolean;
+  className?: string;
 }
 
-export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewChat }) => {
+export const ChatInput: React.FC<ChatInputProps> = ({ 
+  onSend, 
+  isLoading, 
+  onNewChat, 
+  showExamples = true,
+  className = "" 
+}) => {
   const [message, setMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -185,7 +193,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-chatbg border-t border-gray-700 p-4">
+    <div className={`bg-chatbg border-t border-gray-700 p-4 ${className}`}>
       <div className="max-w-3xl mx-auto" ref={(el) => {
         if (el) {
           const height = el.getBoundingClientRect().height;
@@ -194,103 +202,107 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
         }
       }}>
         <div className="flex flex-col space-y-4 mb-4">
-          <div className="flex justify-end gap-2">
-            <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
-              <DialogTrigger asChild>
+          {showExamples && (
+            <>
+              <div className="flex justify-end gap-2">
+                <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700"
+                    >
+                      <Key className="mr-2 h-4 w-4" />
+                      API Keys
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-gray-800 text-gray-200">
+                    <DialogHeader>
+                      <DialogTitle>Configure API Keys</DialogTitle>
+                      <DialogDescription className="text-gray-300">
+                        Enter your API keys to unlock different capabilities. At minimum, the Anthropic API key is required.
+                        Your keys will be stored only on your device and never transmitted to our servers.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">Anthropic API Key (Required)</label>
+                        <Input
+                          type="password"
+                          value={apiKeys.anthropic}
+                          onChange={(e) => setApiKeys(prev => ({ ...prev, anthropic: e.target.value }))}
+                          placeholder="Enter your Anthropic API key"
+                          className="bg-gray-700 border-gray-600 text-gray-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">R1 Deepseek API Key</label>
+                        <Input
+                          type="password"
+                          value={apiKeys.r1deepseek}
+                          onChange={(e) => setApiKeys(prev => ({ ...prev, r1deepseek: e.target.value }))}
+                          placeholder="Enter your R1 Deepseek API key"
+                          className="bg-gray-700 border-gray-600 text-gray-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">OpenAI API Key</label>
+                        <Input
+                          type="password"
+                          value={apiKeys.openai}
+                          onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
+                          placeholder="Enter your OpenAI API key"
+                          className="bg-gray-700 border-gray-600 text-gray-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">Replicate API Key</label>
+                        <Input
+                          type="password"
+                          value={apiKeys.replicate}
+                          onChange={(e) => setApiKeys(prev => ({ ...prev, replicate: e.target.value }))}
+                          placeholder="Enter your Replicate API key"
+                          className="bg-gray-700 border-gray-600 text-gray-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">Serper.dev API Key</label>
+                        <Input
+                          type="password"
+                          value={apiKeys.serperdev}
+                          onChange={(e) => setApiKeys(prev => ({ ...prev, serperdev: e.target.value }))}
+                          placeholder="Enter your Serper.dev API key"
+                          className="bg-gray-700 border-gray-600 text-gray-200"
+                        />
+                      </div>
+                      <Button onClick={handleSaveApiKeys}>Save API Keys</Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
                 <Button
+                  onClick={onNewChat}
                   variant="outline"
                   className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700"
                 >
-                  <Key className="mr-2 h-4 w-4" />
-                  API Keys
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  New Chat
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-gray-800 text-gray-200">
-                <DialogHeader>
-                  <DialogTitle>Configure API Keys</DialogTitle>
-                  <DialogDescription className="text-gray-300">
-                    Enter your API keys to unlock different capabilities. At minimum, the Anthropic API key is required.
-                    Your keys will be stored only on your device and never transmitted to our servers.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">Anthropic API Key (Required)</label>
-                    <Input
-                      type="password"
-                      value={apiKeys.anthropic}
-                      onChange={(e) => setApiKeys(prev => ({ ...prev, anthropic: e.target.value }))}
-                      placeholder="Enter your Anthropic API key"
-                      className="bg-gray-700 border-gray-600 text-gray-200"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">R1 Deepseek API Key</label>
-                    <Input
-                      type="password"
-                      value={apiKeys.r1deepseek}
-                      onChange={(e) => setApiKeys(prev => ({ ...prev, r1deepseek: e.target.value }))}
-                      placeholder="Enter your R1 Deepseek API key"
-                      className="bg-gray-700 border-gray-600 text-gray-200"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">OpenAI API Key</label>
-                    <Input
-                      type="password"
-                      value={apiKeys.openai}
-                      onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
-                      placeholder="Enter your OpenAI API key"
-                      className="bg-gray-700 border-gray-600 text-gray-200"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">Replicate API Key</label>
-                    <Input
-                      type="password"
-                      value={apiKeys.replicate}
-                      onChange={(e) => setApiKeys(prev => ({ ...prev, replicate: e.target.value }))}
-                      placeholder="Enter your Replicate API key"
-                      className="bg-gray-700 border-gray-600 text-gray-200"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">Serper.dev API Key</label>
-                    <Input
-                      type="password"
-                      value={apiKeys.serperdev}
-                      onChange={(e) => setApiKeys(prev => ({ ...prev, serperdev: e.target.value }))}
-                      placeholder="Enter your Serper.dev API key"
-                      className="bg-gray-700 border-gray-600 text-gray-200"
-                    />
-                  </div>
-                  <Button onClick={handleSaveApiKeys}>Save API Keys</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-            <Button
-              onClick={onNewChat}
-              variant="outline"
-              className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              New Chat
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
-            {examples.map((example, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setMessage(example.fullText);
-                }}
-                className="px-4 py-2 bg-gray-800 text-gray-200 rounded-full text-sm hover:bg-gray-700 transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[190px] md:max-w-[290px]"
-                title={example.fullText}
-              >
-                {example.shortText}
-              </button>
-            ))}
-          </div>
+              </div>
+              <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
+                {examples.map((example, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setMessage(example.fullText);
+                    }}
+                    className="px-4 py-2 bg-gray-800 text-gray-200 rounded-full text-sm hover:bg-gray-700 transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[190px] md:max-w-[290px]"
+                    title={example.fullText}
+                  >
+                    {example.shortText}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
         <form onSubmit={handleSubmit} className="flex gap-2">
           <div className="flex-1 relative">
