@@ -112,24 +112,28 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       fullText: "Calculate net salary from gross income in Germany? I want to understand how much of my gross annual salary remains after all deductions. Factors to consider include my tax class, whether I pay church tax, and other relevant aspects. I need a breakdown of all deductions (income tax, solidarity surcharge, health insurance, etc.) and the resulting monthly net amount."
     },
     {
-      shortText: "I'd love to hear a short podcast about siamese cats",
-      fullText: "I'd love to hear a short podcast about siamese cats. Can you also generate a matching cover art image and make it show like a podcast player?"
+      shortText: "I'd love to hear a podcast about siamese cats",
+      fullText: "I'd love to hear a podcast about siamese cats. Can you also generate a matching cover image and give me a podcast player?"
     },
     {
       shortText: "What's the time in Sydney?",
       fullText: "What's the time in Sydney?"
     },
     {
-      shortText: "Can you explain me why PI is 3.14 in an interactive way?",
-      fullText: "Can you explain me why PI is 3.14 in an interactive way?"
-    },    
-    {
-      shortText: "I love to sing, can you measure in realtime which note i hit?",
-      fullText: "I love to sing, can you measure in realtime which note i hit?"
+      shortText: "Can you explain me why PI is 3.14?",
+      fullText: "Can you explain me why PI is 3.14?"
     },        
     {
       shortText: "I want to play a game of tetris",
       fullText: "I want to play a game of tetris"
+    },            
+    {
+      shortText: "I need to note down some todo items",
+      fullText: "I need to note down some todo items"
+    },            
+    {
+      shortText: "I want to take notes by speaking",
+      fullText: "I want to take notes by speaking into the microphone, show me the transcribed text but then also rephrase it in a way that is easy to read and understand."
     },            
   ];
 

@@ -37,8 +37,6 @@ Format your response as a JSON object:
   "responsetype": "text" or "html",
   "response": "your response content"
 }
-
-You must always (!) respond with a function call to the output_json function, which takes a JSON object in the format specified above as an argument.
 `;
 
 
