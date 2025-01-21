@@ -14,21 +14,34 @@ interface ChatInputProps {
 
 export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewChat }) => {
   const [message, setMessage] = useState("");
-  const [apiKey, setApiKey] = useState("");
+  const [apiKeys, setApiKeys] = useState({
+    anthropic: "",
+    r1deepseek: "",
+    openai: "",
+    replicate: "",
+    serperdev: ""
+  });
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    const savedKey = localStorage.getItem('ANTHROPIC_API_KEY');
-    if (!savedKey) {
+    // Load all saved API keys
+    const savedKeys = {
+      anthropic: localStorage.getItem('ANTHROPIC_API_KEY') || "",
+      r1deepseek: localStorage.getItem('R1_DEEPSEEK_API_KEY') || "",
+      openai: localStorage.getItem('OPENAI_API_KEY') || "",
+      replicate: localStorage.getItem('REPLICATE_API_KEY') || "",
+      serperdev: localStorage.getItem('SERPERDEV_API_KEY') || ""
+    };
+    setApiKeys(savedKeys);
+
+    if (!savedKeys.anthropic) {
       toast({
-        title: "Anthropic API Key Required",
-        description: "Please click the 'Anthropic API Key' button to set up your API key. Without it, the app will use a limited free model.",
+        title: "API Keys Required",
+        description: "At minimum, please provide an Anthropic API key. Additional API keys unlock more functionality.",
         variant: "destructive",
         duration: 10000,
       });
-    } else {
-      setApiKey(savedKey);
     }
   }, []);
 
@@ -40,15 +53,30 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
     }
   };
 
-  const handleSaveApiKey = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem('ANTHROPIC_API_KEY', apiKey.trim());
-      setShowApiKeyDialog(false);
+  const handleSaveApiKeys = () => {
+    if (!apiKeys.anthropic.trim()) {
       toast({
-        title: "API Key Saved",
-        description: "Your Anthropic API key has been saved successfully.",
+        title: "Error",
+        description: "Anthropic API key is required",
+        variant: "destructive",
       });
+      return;
     }
+
+    // Save all API keys to localStorage
+    Object.entries(apiKeys).forEach(([key, value]) => {
+      if (value.trim()) {
+        localStorage.setItem(`${key.toUpperCase()}_API_KEY`, value.trim());
+      } else {
+        localStorage.removeItem(`${key.toUpperCase()}_API_KEY`);
+      }
+    });
+
+    setShowApiKeyDialog(false);
+    toast({
+      title: "API Keys Saved",
+      description: "Your API keys have been saved successfully.",
+    });
   };
 
   const examples = [
@@ -84,26 +112,69 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, onNewCh
                   className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700"
                 >
                   <Key className="mr-2 h-4 w-4" />
-                  Anthropic API Key
+                  API Keys
                 </Button>
               </DialogTrigger>
               <DialogContent className="bg-gray-800 text-gray-200">
                 <DialogHeader>
-                  <DialogTitle>Set Anthropic API Key</DialogTitle>
+                  <DialogTitle>Configure API Keys</DialogTitle>
                   <DialogDescription className="text-gray-300">
-                    Enter your Anthropic API key to use Claude 3.5 Sonnet (New). Your key will be stored only on your device and never transmitted to our servers.
-                    Without an API key, the app will fall back to a limited free model with strong rate limits.
+                    Enter your API keys to unlock different capabilities. At minimum, the Anthropic API key is required.
+                    Your keys will be stored only on your device and never transmitted to our servers.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
-                  <Input
-                    type="password"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="Enter your Anthropic API key"
-                    className="bg-gray-700 border-gray-600 text-gray-200"
-                  />
-                  <Button onClick={handleSaveApiKey}>Save API Key</Button>
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Anthropic API Key (Required)</label>
+                    <Input
+                      type="password"
+                      value={apiKeys.anthropic}
+                      onChange={(e) => setApiKeys(prev => ({ ...prev, anthropic: e.target.value }))}
+                      placeholder="Enter your Anthropic API key"
+                      className="bg-gray-700 border-gray-600 text-gray-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">R1 Deepseek API Key</label>
+                    <Input
+                      type="password"
+                      value={apiKeys.r1deepseek}
+                      onChange={(e) => setApiKeys(prev => ({ ...prev, r1deepseek: e.target.value }))}
+                      placeholder="Enter your R1 Deepseek API key"
+                      className="bg-gray-700 border-gray-600 text-gray-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">OpenAI API Key</label>
+                    <Input
+                      type="password"
+                      value={apiKeys.openai}
+                      onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
+                      placeholder="Enter your OpenAI API key"
+                      className="bg-gray-700 border-gray-600 text-gray-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Replicate API Key</label>
+                    <Input
+                      type="password"
+                      value={apiKeys.replicate}
+                      onChange={(e) => setApiKeys(prev => ({ ...prev, replicate: e.target.value }))}
+                      placeholder="Enter your Replicate API key"
+                      className="bg-gray-700 border-gray-600 text-gray-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Serper.dev API Key</label>
+                    <Input
+                      type="password"
+                      value={apiKeys.serperdev}
+                      onChange={(e) => setApiKeys(prev => ({ ...prev, serperdev: e.target.value }))}
+                      placeholder="Enter your Serper.dev API key"
+                      className="bg-gray-700 border-gray-600 text-gray-200"
+                    />
+                  </div>
+                  <Button onClick={handleSaveApiKeys}>Save API Keys</Button>
                 </div>
               </DialogContent>
             </Dialog>
