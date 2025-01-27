@@ -1,4 +1,4 @@
-export const getSystemPrompt = () => `You are an AI assistant that responds with either text or HTML fragments. 
+export const getSystemPrompt = (shorter = false) => `You are an AI assistant that responds with either text or HTML fragments. 
           
 IMPORTANT: When deciding between text and HTML responses, ALWAYS prefer HTML fragments, use text only if you can't think of a reasonable HTML widget to respond with.
 Cases where you should use text are for example if you are asked to write a specific text, like a letter or message or poem, but if the question is more open ended, like
@@ -28,9 +28,11 @@ Examples for common scenarios:
    Use this example:
    ${HTML_EXAMPLES.germanSalary}
 
+${(shorter ? '' : `
 3. For text generators (e.g., If the user asks for a way to create song reviews for applicants to their Spotify playlist):
    Use this example:
    ${HTML_EXAMPLES.songEvaluation}
+`)}   
 
 Format your response as a JSON object:
 {

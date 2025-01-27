@@ -135,6 +135,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       shortText: "I want to take notes by speaking",
       fullText: "I want to take notes by speaking into the microphone, show me the transcribed text but then also rephrase it in a way that is easy to read and understand."
     },            
+    {
+      shortText: "I want to learn french",
+      fullText: "I want to learn french. How about you show me english sentences and I try to say their translation in french and then you correct me?"
+    },            
+    {
+      shortText: "Where are the most beautiful sand beaches in crete?",
+      fullText: "Where are the most beautiful sand beaches in crete?"
+    }    
   ];
 
   const startRecording = async () => {

@@ -1,5 +1,6 @@
 import { Anthropic } from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
+import Groq from 'groq-sdk';
 import { getSystemPrompt, HTML_EXAMPLES } from '@/utils/promptExamples';
 
 export interface ChatResponse {
@@ -54,7 +55,9 @@ const formatR1Response = async (r1Response: string, anthropic: Anthropic): Promi
 };
 
 const getEnhancedSystemPrompt = () => {
-  const basePrompt = getSystemPrompt();
+  const groqKey = localStorage.getItem('GROQ_API_KEY');
+  const needShorterPrompt = groqKey ? true : false;
+  const basePrompt = getSystemPrompt(needShorterPrompt);
   const serperKey = localStorage.getItem('SERPERDEV_API_KEY');
   const openaiKey = localStorage.getItem('OPENAI_API_KEY');
   const r1Key = localStorage.getItem('R1DEEPSEEK_API_KEY');
@@ -174,6 +177,7 @@ export const sendMessage = async (
   
   const anthropicKey = localStorage.getItem('ANTHROPIC_API_KEY');
   const r1Key = localStorage.getItem('R1DEEPSEEK_API_KEY');
+  const groqKey = localStorage.getItem('GROQ_API_KEY');
   
   if (!anthropicKey) {
     return {
@@ -188,9 +192,54 @@ export const sendMessage = async (
     dangerouslyAllowBrowser: true,
   });
 
-  // Try R1 first if available
+  // Try Groq first if available
+  if (groqKey) {
+    console.log("Using Groq API first");
+    try {
+      const groq = new Groq({
+        apiKey: groqKey,
+        dangerouslyAllowBrowser: true,
+      });
+
+      const systemPrompt = getEnhancedSystemPrompt();
+      const completion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          ...history.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
+        ],
+        model: "deepseek-r1-distill-llama-70b",
+        temperature: 0.6,
+        max_completion_tokens: 4096,
+        top_p: 0.95,
+        stream: false,
+        stop: null
+      });
+
+      const groqResponse = completion.choices[0].message.content;
+      if (groqResponse) {
+        try {
+          const parsed = JSON.parse(groqResponse);
+          if (parsed.responsetype && parsed.response) {
+            return parsed as ChatResponse;
+          }
+        } catch (e) {
+          console.log("Failed to parse Groq response as ChatResponse, sending to Anthropic for review");
+        }
+      }
+    } catch (error) {
+      console.error("Error with Groq, falling back to R1:", error);
+    }
+  }
+
+  // Try R1 if available and Groq failed or not available
   if (r1Key) {
-    console.log("Using R1 Deepseek first");
+    console.log("Using R1 Deepseek");
     try {
       const openai = new OpenAI({
         baseURL: 'https://api.deepseek.com',

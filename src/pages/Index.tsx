@@ -118,7 +118,8 @@ const Index = () => {
     r1deepseek: "",
     openai: "",
     replicate: "",
-    serperdev: ""
+    serperdev: "",
+    groq: ""
   });
 
   useEffect(() => {
@@ -128,7 +129,8 @@ const Index = () => {
       r1deepseek: localStorage.getItem('R1DEEPSEEK_API_KEY') || "",
       openai: localStorage.getItem('OPENAI_API_KEY') || "",
       replicate: localStorage.getItem('REPLICATE_API_KEY') || "",
-      serperdev: localStorage.getItem('SERPERDEV_API_KEY') || ""
+      serperdev: localStorage.getItem('SERPERDEV_API_KEY') || "",
+      groq: localStorage.getItem('GROQ_API_KEY') || ""
     };
     setApiKeys(savedKeys);
   }, []);
@@ -292,6 +294,16 @@ const Index = () => {
                   value={apiKeys.serperdev}
                   onChange={(e) => setApiKeys(prev => ({ ...prev, serperdev: e.target.value }))}
                   placeholder="Enter your Serper.dev API key"
+                  className="bg-gray-700 border-gray-600 text-gray-200"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Groq API Key</label>
+                <Input
+                  type="password"
+                  value={apiKeys.groq}
+                  onChange={(e) => setApiKeys(prev => ({ ...prev, groq: e.target.value }))}
+                  placeholder="Enter your Groq API key"
                   className="bg-gray-700 border-gray-600 text-gray-200"
                 />
               </div>
