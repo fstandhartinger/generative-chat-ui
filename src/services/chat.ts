@@ -178,6 +178,7 @@ export const sendMessage = async (
   const anthropicKey = localStorage.getItem('ANTHROPIC_API_KEY');
   const r1Key = localStorage.getItem('R1DEEPSEEK_API_KEY');
   const groqKey = localStorage.getItem('GROQ_API_KEY');
+  const openaiKey = localStorage.getItem('OPENAI_API_KEY');
   
   if (!anthropicKey) {
     return {
@@ -192,7 +193,49 @@ export const sendMessage = async (
     dangerouslyAllowBrowser: true,
   });
 
-  // Try Groq first if available
+  // Try OpenAI o3-mini first if available
+  if (openaiKey) {
+    console.log("Using OpenAI o3-mini API first");
+    try {
+      const openai = new OpenAI({
+        apiKey: openaiKey,
+        dangerouslyAllowBrowser: true,
+      });
+
+      const systemPrompt = getEnhancedSystemPrompt();
+      const completion = await openai.chat.completions.create({
+        model: "o3-mini",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          ...history.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
+        ],
+        temperature: 0.7,
+        response_format: { type: "json_object" }
+      });
+
+      const o3Response = completion.choices[0].message.content;
+      if (o3Response) {
+        try {
+          const parsed = JSON.parse(o3Response);
+          if (parsed.responsetype && parsed.response) {
+            return parsed as ChatResponse;
+          }
+        } catch (e) {
+          console.log("Failed to parse o3-mini response as ChatResponse, sending to Anthropic for review");
+        }
+      }
+    } catch (error) {
+      console.error("Error with OpenAI o3-mini, falling back to Groq:", error);
+    }
+  }
+
+  // Try Groq if o3-mini failed or not available
   if (groqKey) {
     console.log("Using Groq API first");
     try {
