@@ -215,7 +215,7 @@ export const sendMessage = async (
             content: msg.content
           }))
         ],
-        temperature: 0.7,
+        reasoning_effort: "medium",
         response_format: { type: "json_object" }
       });
 
