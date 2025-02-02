@@ -1,12 +1,13 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { ChatMessage } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
 import { sendMessage } from "@/services/chat";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Key } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Message {
   role: "user" | "assistant";
@@ -15,42 +16,30 @@ interface Message {
 
 const AssistantResponse = ({ content }: { content: string }) => {
   useEffect(() => {
-    // Create a temporary container
     const container = document.createElement('div');
     container.innerHTML = content;
     
-    // Find all external scripts and inline scripts
     const scripts = Array.from(container.getElementsByTagName('script'));
     const externalScripts = scripts.filter(script => script.src);
     const inlineScripts = scripts.filter(script => !script.src);
     
-    // Function to load external script
     const loadExternalScript = (script: HTMLScriptElement): Promise<void> => {
       return new Promise((resolve, reject) => {
         const newScript = document.createElement('script');
-        
-        // Copy all attributes
         Array.from(script.attributes).forEach(attr => {
           newScript.setAttribute(attr.name, attr.value);
         });
-        
         newScript.onload = () => resolve();
         newScript.onerror = () => reject();
-        
         document.body.appendChild(newScript);
       });
     };
     
-    // Function to execute inline script
     const executeInlineScript = (script: HTMLScriptElement) => {
       const newScript = document.createElement('script');
-      
-      // Copy all attributes
       Array.from(script.attributes).forEach(attr => {
         newScript.setAttribute(attr.name, attr.value);
       });
-      
-      // Execute script
       const scriptContent = script.innerHTML;
       newScript.innerHTML = `
         try {
@@ -59,17 +48,13 @@ const AssistantResponse = ({ content }: { content: string }) => {
           console.error('Error executing script:', error);
         }
       `;
-      
       document.body.appendChild(newScript);
       return newScript;
     };
     
-    // Keep track of added scripts for cleanup
     const addedScripts: HTMLScriptElement[] = [];
     
-    // Load all scripts in sequence
     const loadAllScripts = async () => {
-      // First load all external scripts
       for (const script of externalScripts) {
         try {
           await loadExternalScript(script);
@@ -77,25 +62,19 @@ const AssistantResponse = ({ content }: { content: string }) => {
           console.error('Error loading external script:', error);
         }
       }
-      
-      // Then execute inline scripts
       for (const script of inlineScripts) {
         const newScript = executeInlineScript(script);
         addedScripts.push(newScript);
       }
     };
     
-    // Start loading scripts
     loadAllScripts();
 
-    // Add the HTML content
     const contentDiv = document.createElement('div');
     contentDiv.innerHTML = content;
-    // Remove script tags from the content to prevent double execution
     Array.from(contentDiv.getElementsByTagName('script')).forEach(script => script.remove());
     
     return () => {
-      // Cleanup scripts on unmount
       addedScripts.forEach(script => {
         if (script && script.parentNode) {
           script.parentNode.removeChild(script);
@@ -123,7 +102,6 @@ const Index = () => {
   });
 
   useEffect(() => {
-    // Load all saved API keys
     const savedKeys = {
       anthropic: localStorage.getItem('ANTHROPIC_API_KEY') || "",
       r1deepseek: localStorage.getItem('R1DEEPSEEK_API_KEY') || "",
@@ -145,7 +123,6 @@ const Index = () => {
       return;
     }
 
-    // Save all API keys to localStorage
     Object.entries(apiKeys).forEach(([key, value]) => {
       if (value.trim()) {
         localStorage.setItem(`${key.toUpperCase()}_API_KEY`, value.trim());
@@ -186,7 +163,6 @@ const Index = () => {
 
       const response = await sendMessage(message, history);
       
-      // Update the last message (remove loading state and set content)
       setMessages(currentMessages => {
         const updatedMessages = [...currentMessages];
         updatedMessages[updatedMessages.length - 1] = {
@@ -199,7 +175,6 @@ const Index = () => {
       });
     } catch (error) {
       console.error("Error sending message:", error);
-      // Remove the loading message on error
       setMessages(currentMessages => currentMessages.slice(0, -1));
       toast({
         title: "Error",
@@ -213,7 +188,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-chatbg text-gray-200">
-      {/* Top bar */}
       <div className="h-14 border-b border-gray-800 bg-gray-900/50 backdrop-blur fixed top-0 left-0 right-0 z-10 flex items-center justify-between px-4">
         {messages.length > 0 && (
           <Button
@@ -241,79 +215,80 @@ const Index = () => {
           <DialogContent className="bg-gray-800 text-gray-200 sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Configure API Keys</DialogTitle>
-              <DialogDescription className="text-gray-300">
+              <div className="text-gray-300 text-sm">
                 Enter your API keys to unlock different capabilities. At minimum, the Anthropic API key is required.
                 Your keys will be stored only on your device and never transmitted to our servers.
-              </DialogDescription>
+              </div>
             </DialogHeader>
-            <div className="flex flex-col gap-4">
-              <div>
-                <label className="text-sm font-medium mb-1 block">Anthropic API Key (Required)</label>
-                <Input
-                  type="password"
-                  value={apiKeys.anthropic}
-                  onChange={(e) => setApiKeys(prev => ({ ...prev, anthropic: e.target.value }))}
-                  placeholder="Enter your Anthropic API key"
-                  className="bg-gray-700 border-gray-600 text-gray-200"
-                />
+            <ScrollArea className="h-[60vh] pr-4">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Anthropic API Key (Required)</label>
+                  <Input
+                    type="password"
+                    value={apiKeys.anthropic}
+                    onChange={(e) => setApiKeys(prev => ({ ...prev, anthropic: e.target.value }))}
+                    placeholder="Enter your Anthropic API key"
+                    className="bg-gray-700 border-gray-600 text-gray-200"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">R1 Deepseek API Key</label>
+                  <Input
+                    type="password"
+                    value={apiKeys.r1deepseek}
+                    onChange={(e) => setApiKeys(prev => ({ ...prev, r1deepseek: e.target.value }))}
+                    placeholder="Enter your R1 Deepseek API key"
+                    className="bg-gray-700 border-gray-600 text-gray-200"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">OpenAI API Key</label>
+                  <Input
+                    type="password"
+                    value={apiKeys.openai}
+                    onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
+                    placeholder="Enter your OpenAI API key"
+                    className="bg-gray-700 border-gray-600 text-gray-200"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Replicate API Key</label>
+                  <Input
+                    type="password"
+                    value={apiKeys.replicate}
+                    onChange={(e) => setApiKeys(prev => ({ ...prev, replicate: e.target.value }))}
+                    placeholder="Enter your Replicate API key"
+                    className="bg-gray-700 border-gray-600 text-gray-200"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Serper.dev API Key</label>
+                  <Input
+                    type="password"
+                    value={apiKeys.serperdev}
+                    onChange={(e) => setApiKeys(prev => ({ ...prev, serperdev: e.target.value }))}
+                    placeholder="Enter your Serper.dev API key"
+                    className="bg-gray-700 border-gray-600 text-gray-200"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Groq API Key</label>
+                  <Input
+                    type="password"
+                    value={apiKeys.groq}
+                    onChange={(e) => setApiKeys(prev => ({ ...prev, groq: e.target.value }))}
+                    placeholder="Enter your Groq API key"
+                    className="bg-gray-700 border-gray-600 text-gray-200"
+                  />
+                </div>
+                <Button onClick={handleSaveApiKeys} className="mt-4">Save API Keys</Button>
               </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">R1 Deepseek API Key</label>
-                <Input
-                  type="password"
-                  value={apiKeys.r1deepseek}
-                  onChange={(e) => setApiKeys(prev => ({ ...prev, r1deepseek: e.target.value }))}
-                  placeholder="Enter your R1 Deepseek API key"
-                  className="bg-gray-700 border-gray-600 text-gray-200"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">OpenAI API Key</label>
-                <Input
-                  type="password"
-                  value={apiKeys.openai}
-                  onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
-                  placeholder="Enter your OpenAI API key"
-                  className="bg-gray-700 border-gray-600 text-gray-200"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">Replicate API Key</label>
-                <Input
-                  type="password"
-                  value={apiKeys.replicate}
-                  onChange={(e) => setApiKeys(prev => ({ ...prev, replicate: e.target.value }))}
-                  placeholder="Enter your Replicate API key"
-                  className="bg-gray-700 border-gray-600 text-gray-200"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">Serper.dev API Key</label>
-                <Input
-                  type="password"
-                  value={apiKeys.serperdev}
-                  onChange={(e) => setApiKeys(prev => ({ ...prev, serperdev: e.target.value }))}
-                  placeholder="Enter your Serper.dev API key"
-                  className="bg-gray-700 border-gray-600 text-gray-200"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">Groq API Key</label>
-                <Input
-                  type="password"
-                  value={apiKeys.groq}
-                  onChange={(e) => setApiKeys(prev => ({ ...prev, groq: e.target.value }))}
-                  placeholder="Enter your Groq API key"
-                  className="bg-gray-700 border-gray-600 text-gray-200"
-                />
-              </div>
-              <Button onClick={handleSaveApiKeys}>Save API Keys</Button>
-            </div>
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Main content with top padding for the fixed header */}
       <div className={`pt-14 h-[calc(100vh-var(--chat-input-height,0px))] overflow-y-auto ${messages.length === 0 ? 'flex items-center justify-center' : ''}`}>
         {messages.length === 0 ? (
           <div className="w-full max-w-3xl mx-auto px-4 flex flex-col items-center -mt-14">
